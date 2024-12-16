@@ -1,1 +1,15 @@
+reach-frontend/
+│
+├── public/                // Default React public folder
+├── src/                   // Source folder where you'll add your files
+│   ├── App.js             // Main component
+│   ├── TokenSale.js       // Token sale UI component
+│   ├── WalletConnect.js   // Wallet connection component
+│   ├── useContract.js     // Smart contract interaction utility
+│   ├── index.js           // React entry point
+│   └── index.css          // Optional: Custom styles
+│
+├── .env                   // Environment variables
+├── package.json           // Node.js dependencies
+└── README.md              // Documentation for your project
 
