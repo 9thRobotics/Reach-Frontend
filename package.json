@@ -21,7 +21,7 @@
     "gh-pages": "^5.0.0"
   }
 }
-  },
+  
 "scripts": {
   "dev": "vite", 
   "build": "vite build", 
@@ -47,5 +47,5 @@
       "last 1 safari version"
     ]
   }
-}
+
 
