@@ -4,6 +4,19 @@ import WalletConnect from "./WalletConnect";
 import "./App.css"; // Optional: Add styles
 
 import React from "react";
+import TokenSale from "./TokenSale";
+
+function App() {
+  return (
+    <div>
+      <h1>Reach Token Frontend</h1>
+      <TokenSale />
+    </div>
+  );
+}
+
+export default App;
+
 
 function App() {
   return (
