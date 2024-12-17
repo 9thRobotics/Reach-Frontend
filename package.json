@@ -3,27 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "vite",                 // Start local development server
-    "build": "vite build",         // Build for production
-    "preview": "vite preview",     // Preview production build
-    "start": "vite",               // Alias for vite
-    "predeploy": "npm run build",  // Build before deployment
-    "deploy": "gh-pages -d dist"   // Deploy to GitHub Pages
+    "start": "react-scripts start",              // Start development server
+    "dev": "vite",                               // Use Vite for development
+    "build": "vite build",                       // Build project for production
+    "preview": "vite preview",                   // Preview production build
+    "predeploy": "npm run build",                // Build before deploying
+    "deploy": "gh-pages -d dist"                 // Deploy to GitHub Pages
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "ethers": "^6.7.0"             // Ethers.js for blockchain interaction
+    "ethers": "^6.7.0",                          // Ethers.js for blockchain interaction
+    "react": "^18.2.0",                          // React library
+    "react-dom": "^18.2.0"                       // React DOM library
   },
   "devDependencies": {
-    "vite": "^6.0.3",
-    "@vitejs/plugin-react": "^4.0.0"
+    "@vitejs/plugin-react": "^4.0.0",            // React plugin for Vite
+    "vite": "^6.0.3",                            // Vite for faster development builds
+    "gh-pages": "^6.0.0"                         // GitHub Pages deployment
   },
   "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "extends": ["react-app", "react-app/jest"]   // ESLint configuration for React
   },
   "browserslist": {
     "production": [
@@ -38,3 +36,4 @@
     ]
   }
 }
+
