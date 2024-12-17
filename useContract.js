@@ -1,22 +1,15 @@
 import { ethers } from "ethers";
 import TokenABI from "./TokenABI.json";
 
-const useContract = () => {
-  const CONTRACT_ADDRESS = process.env.REACT_APP_CONTRACT_ADDRESS;
+export function getContract() {
+  const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS;
 
-  // Check if CONTRACT_ADDRESS exists
-  if (!CONTRACT_ADDRESS) {
-    console.error("REACT_APP_CONTRACT_ADDRESS is not defined in your .env file.");
-  }
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
 
-  // Function to get the contract
-  const getContract = () => {
-    if (!window.ethereum) {
-      alert("MetaMask is not installed. Please install MetaMask to use this feature.");
-      console.error("Ethereum provider (MetaMask) not found.");
-      return null;
-    }
-
+  const tokenContract = new ethers.Contract(contractAddress, TokenABI, signer);
+  return tokenContract;
+}
     try {
       // Initialize provider and signer
       const provider = new ethers.providers.Web3Provider(window.ethereum);
