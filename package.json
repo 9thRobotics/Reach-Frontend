@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "start": "vite"
+    "dev": "vite",                 // Start local development server
+    "build": "vite build",         // Build for production
+    "preview": "vite preview",     // Preview production build
+    "start": "vite"                // Alias for vite
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -16,43 +16,6 @@
   "devDependencies": {
     "vite": "^6.0.3",
     "@vitejs/plugin-react": "^4.0.0"
-  }
-}
-  "name": "reach-frontend",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "start": "vite",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
-  },
-  "dependencies": {
-    "ethers": "^6.7.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.0",
-    "vite": "^6.0.3",
-    "gh-pages": "^5.0.0"
-  }
-}
-  
-"scripts": {
-  "dev": "vite", 
-  "build": "vite build", 
-  "preview": "vite preview", 
-  "start": "vite"
-}
-
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [
@@ -66,5 +29,6 @@
       "last 1 safari version"
     ]
   }
+}
 
 
