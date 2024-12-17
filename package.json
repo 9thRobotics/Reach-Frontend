@@ -2,21 +2,25 @@
   "name": "reach-frontend",
   "version": "0.1.0",
   "private": true,
-  "dependencies": {
-    "ethers": "^5.7.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "web3": "^1.10.0"
+ "dependencies": {
+  "react": "^18.2.0",
+  "react-dom": "^18.2.0"
+},
+"devDependencies": {
+  "@vitejs/plugin-react": "^4.1.0",
+  "vite": "^6.0.3"
+}
+
   },
   "devDependencies": {
     "vite": "^6.0.3"
   },
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "start": "vite"
+ "scripts": {
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview"
+}
+
   },
   "eslintConfig": {
     "extends": [
