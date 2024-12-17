@@ -1,56 +1,91 @@
-import React, { useState } from 'react';
-import { ethers } from 'ethers';
-import useContract from './useContract'; // Custom hook to load the contract
+import React, { useState, useEffect } from "react";
+import { ethers } from "ethers";
+import useContract from "./useContract"; // Assuming you have a utility to load the contract
 
-function TokenSale() {
-  const { contract } = useContract(); // Get the smart contract instance
-  const [ethAmount, setEthAmount] = useState(''); // ETH input state
-  const [loading, setLoading] = useState(false); // Loading state
+const TokenSale = () => {
+  const [userAddress, setUserAddress] = useState(null);
+  const [amount, setAmount] = useState("");
+  const [status, setStatus] = useState("");
+  const [provider, setProvider] = useState(null);
+  const [signer, setSigner] = useState(null);
+  const [contract, setContract] = useState(null);
 
-  const handlePurchase = async () => {
-    if (!ethAmount || isNaN(ethAmount)) {
-      alert('Please enter a valid ETH amount');
+  const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS;
+
+  // Connect to MetaMask
+  const connectWallet = async () => {
+    if (window.ethereum) {
+      try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = provider.getSigner();
+        const address = await signer.getAddress();
+
+        setProvider(provider);
+        setSigner(signer);
+        setUserAddress(address);
+
+        // Load contract using useContract hook
+        const loadedContract = useContract(provider, signer);
+        setContract(loadedContract);
+
+        setStatus("Wallet connected successfully!");
+      } catch (error) {
+        console.error("Wallet connection failed:", error);
+        setStatus("Failed to connect wallet.");
+      }
+    } else {
+      alert("MetaMask is not installed. Please install MetaMask and try again.");
+    }
+  };
+
+  // Purchase tokens
+  const buyTokens = async () => {
+    if (!contract || !signer) {
+      setStatus("Connect your wallet first.");
       return;
     }
 
     try {
-      setLoading(true);
-      const value = ethers.utils.parseEther(ethAmount); // Convert ETH to Wei
-
-      // Send ETH to the smart contract
-      const transaction = await contract.buyTokens({
-        value: value,
+      const amountInEther = ethers.utils.parseEther(amount);
+      const tx = await signer.sendTransaction({
+        to: contractAddress, // Address of your token sale contract
+        value: amountInEther,
       });
 
-      await transaction.wait(); // Wait for confirmation
-      alert('Tokens purchased successfully!');
+      await tx.wait();
+      setStatus(`Transaction successful! TX: ${tx.hash}`);
+      setAmount("");
     } catch (error) {
-      console.error('Transaction failed:', error);
-      alert('Transaction failed! Check your wallet or network.');
-    } finally {
-      setLoading(false);
+      console.error("Error purchasing tokens:", error);
+      setStatus("Transaction failed. Check console for details.");
     }
   };
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h2>Reach Token Sale</h2>
-      <p>Purchase Reach Tokens with ETH</p>
-      <input
-        type="text"
-        placeholder="Enter ETH amount"
-        value={ethAmount}
-        onChange={(e) => setEthAmount(e.target.value)}
-      />
-      <button onClick={handlePurchase} disabled={loading}>
-        {loading ? 'Processing...' : 'Buy Tokens'}
-      </button>
+    <div>
+      <h1>Reach Token Sale</h1>
+      <p>Welcome to the Reach Token Presale!</p>
+
+      {!userAddress ? (
+        <button onClick={connectWallet}>Connect Wallet</button>
+      ) : (
+        <div>
+          <p>Connected Wallet: {userAddress}</p>
+          <input
+            type="text"
+            placeholder="Enter ETH amount"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+          <button onClick={buyTokens}>Buy Tokens</button>
+        </div>
+      )}
+
+      {status && <p>{status}</p>}
     </div>
   );
-}
+};
 
 export default TokenSale;
-
-
-
 
