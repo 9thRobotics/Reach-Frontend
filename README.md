@@ -1,8 +1,10 @@
 ## Reach Token Frontend
 This is the front-end application for the Reach Token ecosystem. It allows users to connect their wallets, participate in token sales, and interact with the Reach Token smart contract.
 
+Install dependencies:
+   ```bash
+   npm install
 
-## Reach Token Frontend
 
 ### Installation Steps
 1. Clone the repository:
