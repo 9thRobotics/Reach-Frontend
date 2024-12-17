@@ -21,15 +21,14 @@
     "gh-pages": "^5.0.0"
   }
 }
+  },
+"scripts": {
+  "dev": "vite", 
+  "build": "vite build", 
+  "preview": "vite preview", 
+  "start": "vite"
+}
 
-  },
-  "scripts": {
-    "dev": "vite",                 // Start local development server
-    "build": "vite build",         // Build for production
-    "preview": "vite preview",     // Preview production build
-    "predeploy": "npm run build",  // Build before deploying
-    "deploy": "gh-pages -d build"  // Deploy the build folder
-  },
   "eslintConfig": {
     "extends": [
       "react-app",
