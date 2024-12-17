@@ -3,38 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",              // Start development server
-    "dev": "vite",                               // Use Vite for development
-    "build": "vite build",                       // Build project for production
-    "preview": "vite preview",                   // Preview production build
-    "predeploy": "npm run build",                // Build before deploying
-    "deploy": "gh-pages -d dist"                 // Deploy to GitHub Pages
-    "scripts": {
-  "dev": "vite",                 
-  "build": "vite build",         
-  "preview": "vite preview",     
-  "predeploy": "npm run build",
-  "deploy": "gh-pages -d dist"
-}
-    "homepage": "http://Gilbert1391.github.io/dashboardbox"
-
-    "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
-}
   },
   "dependencies": {
-    "ethers": "^6.7.0",                          // Ethers.js for blockchain interaction
-    "react": "^18.2.0",                          // React library
-    "react-dom": "^18.2.0"                       // React DOM library
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.0",            // React plugin for Vite
-    "vite": "^6.0.3",                            // Vite for faster development builds
-    "gh-pages": "^6.0.0"                         // GitHub Pages deployment
+    "gh-pages": "^6.0.0"
   },
   "eslintConfig": {
-    "extends": ["react-app", "react-app/jest"]   // ESLint configuration for React
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   },
   "browserslist": {
     "production": [
@@ -49,4 +36,3 @@
     ]
   }
 }
-
