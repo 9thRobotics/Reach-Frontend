@@ -2,48 +2,29 @@
   "name": "reach-frontend",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "vite",                 // Start the local development server
-    "build": "vite build",         // Build the project for production
-    "preview": "vite preview",     // Preview production build locally
-    "predeploy": "npm run build",  // Build files before deploying
-    "deploy": "gh-pages -d dist"   // Deploy to GitHub Pages
-  },
+  "homepage": "https://9thRobotics.github.io/Reach-Frontend",
   "dependencies": {
     "ethers": "^6.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
-    {
-  "name": "reach-frontend",
-  "version": "0.1.0",
-  "private": true,
-  "homepage": "https://9thRobotics.github.io/Reach-Frontend",
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "ethers": "^6.7.0"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.1.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.3"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
-  },
-  "devDependencies": {
-    "gh-pages": "^5.0.0"
-  }
-}
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.0",
-    "vite": "^6.0.3",
-    "gh-pages": "^5.0.0"
+    "dev": "vite",                 // Start local development server
+    "build": "vite build",         // Build for production
+    "preview": "vite preview",     // Preview production build
+    "predeploy": "npm run build",  // Build before deploying
+    "deploy": "gh-pages -d build"  // Deploy the build folder
   },
   "eslintConfig": {
-    "extends": ["react-app", "react-app/jest"]
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   },
   "browserslist": {
     "production": [
@@ -58,3 +39,4 @@
     ]
   }
 }
+
