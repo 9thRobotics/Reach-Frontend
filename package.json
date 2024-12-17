@@ -5,3 +5,24 @@
   "preview": "vite preview"
 }
 
+{
+  "name": "reach-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "ethers": "^6.6.2"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0"
+  },
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  }
+}
+
+
