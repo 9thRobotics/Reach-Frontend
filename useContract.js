@@ -4,18 +4,31 @@ import { ethers } from "ethers";
 const INFURA_PROJECT_ID = import.meta.env.VITE_INFURA_PROJECT_ID;
 const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
 
-// Import ABI
-import tokenABI from "./TokenABI.json"; // Replace with your ABI file's name
+// Import ABI (TokenABI.json must be in the same directory)
+import tokenABI from "./TokenABI.json";
 
 // Setup Ethereum Provider
 const provider = new ethers.providers.JsonRpcProvider(
   `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`
 );
 
-// Connect to the Contract
+// Wallet Signer for Transactions
+const getSigner = () => {
+  const { ethereum } = window; // Metamask
+  if (!ethereum) {
+    alert("MetaMask is not installed. Please install it to use this feature.");
+    throw new Error("MetaMask not installed");
+  }
+  const provider = new ethers.providers.Web3Provider(ethereum);
+  return provider.getSigner();
+};
+
+// Connect to the Smart Contract
 const contract = new ethers.Contract(CONTRACT_ADDRESS, tokenABI, provider);
 
-// Function: Get Token Name
+// Utility Functions
+
+// 1. Fetch Token Name
 export const getTokenName = async () => {
   try {
     const name = await contract.name();
@@ -26,7 +39,18 @@ export const getTokenName = async () => {
   }
 };
 
-// Function: Get Total Supply
+// 2. Fetch Token Symbol
+export const getTokenSymbol = async () => {
+  try {
+    const symbol = await contract.symbol();
+    console.log("Token Symbol:", symbol);
+    return symbol;
+  } catch (error) {
+    console.error("Error fetching token symbol:", error);
+  }
+};
+
+// 3. Fetch Total Supply
 export const getTotalSupply = async () => {
   try {
     const totalSupply = await contract.totalSupply();
@@ -37,7 +61,7 @@ export const getTotalSupply = async () => {
   }
 };
 
-// Function: Get Token Balance of an Address
+// 4. Fetch Balance of an Address
 export const getBalance = async (address) => {
   try {
     const balance = await contract.balanceOf(address);
@@ -51,4 +75,22 @@ export const getBalance = async (address) => {
   }
 };
 
+// 5. Transfer Tokens (Requires Wallet Connection)
+export const transferTokens = async (to, amount) => {
+  try {
+    const signer = getSigner();
+    const contractWithSigner = contract.connect(signer);
+
+    const tx = await contractWithSigner.transfer(
+      to,
+      ethers.utils.parseUnits(amount.toString(), 18)
+    );
+    await tx.wait();
+
+    console.log("Tokens transferred:", tx.hash);
+    return tx.hash;
+  } catch (error) {
+    console.error("Error transferring tokens:", error);
+  }
+};
 
