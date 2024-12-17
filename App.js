@@ -1,65 +1,43 @@
-import React from "react";
-import TokenSale from "./TokenSale";
-import WalletConnect from "./WalletConnect";
-import "./App.css"; // Optional: Add styles
-
-import React from "react";
-import TokenSale from "./TokenSale";
+import React, { useEffect } from "react";
+import {
+  getTokenName,
+  getTokenSymbol,
+  getTotalSupply,
+  getBalance,
+  transferTokens,
+} from "./useContract";
 
 function App() {
+  useEffect(() => {
+    const fetchData = async () => {
+      const name = await getTokenName();
+      const symbol = await getTokenSymbol();
+      const totalSupply = await getTotalSupply();
+      console.log(`Token Info: ${name} (${symbol})`);
+      console.log("Total Supply:", totalSupply);
+
+      // Replace with a wallet address to test balance
+      const balance = await getBalance("0xYourWalletAddressHere");
+      console.log("Your Balance:", balance);
+    };
+
+    fetchData();
+  }, []);
+
+  const handleTransfer = async () => {
+    const recipient = prompt("Enter recipient address:");
+    const amount = prompt("Enter amount to transfer:");
+    await transferTokens(recipient, amount);
+  };
+
   return (
     <div>
       <h1>Reach Token Frontend</h1>
-      <TokenSale />
+      <button onClick={handleTransfer}>Transfer Tokens</button>
     </div>
   );
 }
 
 export default App;
 
-
-function App() {
-  return (
-    <div>
-      <h1>Welcome to the Reach Token Frontend</h1>
-      <p>This is the front-end interface for the Reach Token project.</p>
-    </div>
-  );
-}
-
-export default App;
-
-
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Welcome to Reach Token</h1>
-        <p>The future of robotics and AI-powered solutions</p>
-      </header>
-      
-      <main>
-        {/* Wallet Connect Section */}
-        <section id="wallet-connect">
-          <h2>Connect Your Wallet</h2>
-          <WalletConnect />
-        </section>
-
-        {/* Token Sale Section */}
-        <section id="token-sale">
-          <h2>Token Sale</h2>
-          <TokenSale />
-        </section>
-      </main>
-
-      <footer>
-        <p>
-          © 2024 9th Dimension Robotics | All rights reserved.
-        </p>
-      </footer>
-    </div>
-  );
-}
-
-export default App;
 
