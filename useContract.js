@@ -10,6 +10,22 @@ export function getContract() {
   const tokenContract = new ethers.Contract(contractAddress, TokenABI, signer);
   return tokenContract;
 }
+import { ethers } from "ethers";
+
+const INFURA_PROJECT_ID = import.meta.env.VITE_INFURA_PROJECT_ID;
+const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
+
+// Set up provider and contract
+const provider = new ethers.providers.JsonRpcProvider(
+  `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`
+);
+const abi = [
+  /* Token ABI goes here */
+];
+const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, provider);
+
+export default contract;
+
     try {
       // Initialize provider and signer
       const provider = new ethers.providers.Web3Provider(window.ethereum);
