@@ -7,3 +7,5 @@ export default defineConfig({
     port: 5173, // Default Vite port
   },
 });
+
+
