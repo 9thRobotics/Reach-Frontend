@@ -3,6 +3,20 @@ import TokenSale from "./TokenSale";
 import WalletConnect from "./WalletConnect";
 import "./App.css"; // Optional: Add styles
 
+import React from "react";
+
+function App() {
+  return (
+    <div>
+      <h1>Welcome to the Reach Token Frontend</h1>
+      <p>This is the front-end interface for the Reach Token project.</p>
+    </div>
+  );
+}
+
+export default App;
+
+
 function App() {
   return (
     <div className="App">
