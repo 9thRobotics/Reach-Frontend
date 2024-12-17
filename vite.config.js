@@ -6,5 +6,5 @@ export default defineConfig({
   server: {
     port: 5173
   },
-  base: '/Reach-Frontend/' // This ensures GitHub Pages serves the app correctly
+  base: '/Reach-Frontend/' 
 });
