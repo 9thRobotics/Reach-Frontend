@@ -3,32 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "vite",                 
-    "build": "vite build",         
-    "preview": "vite preview",    
-    "start": "vite"                
+    "dev": "vite",                 // Start development server
+    "start": "vite",               // Alias for dev
+    "build": "vite build",         // Build production-ready files
+    "preview": "vite preview",     // Preview production build
+    "predeploy": "npm run build",  // Build before deployment
+    "deploy": "gh-pages -d dist"   // Deploy to GitHub Pages
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "ethers": "^6.7.0"
+    "ethers": "^6.7.0",            // Ethers.js for interacting with the contract
+    "react": "^18.2.0",            // React library
+    "react-dom": "^18.2.0"         // React DOM for rendering components
   },
   "devDependencies": {
-    "vite": "^6.0.3",
-    "@vitejs/plugin-react": "^4.0.0"
+    "@vitejs/plugin-react": "^4.0.0", // Vite plugin for React
+    "vite": "^6.0.3",                 // Vite build tool
+    "gh-pages": "^6.0.0"              // GitHub Pages deployment tool
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "homepage": "https://9thRobotics.github.io/Reach-Frontend"
 }
 
 
