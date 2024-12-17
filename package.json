@@ -9,7 +9,13 @@
     "preview": "vite preview",                   // Preview production build
     "predeploy": "npm run build",                // Build before deploying
     "deploy": "gh-pages -d dist"                 // Deploy to GitHub Pages
-    
+    "scripts": {
+  "dev": "vite",                 
+  "build": "vite build",         
+  "preview": "vite preview",     
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d dist"
+}
     "homepage": "http://Gilbert1391.github.io/dashboardbox"
 
     "scripts": {
