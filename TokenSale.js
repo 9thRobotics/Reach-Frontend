@@ -1,51 +1,88 @@
 import React, { useState } from "react";
-import connectWallet from "./WalletConnect";
 import { getContract } from "./useContract";
+import axios from "axios";
 
-function TokenSale() {
-  const [account, setAccount] = useState("");
-  const [amount, setAmount] = useState("");
+const TokenSale = () => {
+  const [ethAmount, setEthAmount] = useState("");
+  const [transactionHash, setTransactionHash] = useState("");
+  const [error, setError] = useState("");
 
-  async function handleConnect() {
-    const connectedAccount = await connectWallet();
-    setAccount(connectedAccount);
-  }
-
-  async function buyTokens() {
-    if (!account) {
-      alert("Please connect your wallet first.");
-      return;
-    }
-
+  const handlePurchase = async () => {
+    setError("");
+    setTransactionHash("");
     try {
-      const contract = getContract();
-      const tx = await contract.buyTokens({ value: ethers.utils.parseEther(amount) });
+      if (!ethAmount || isNaN(ethAmount)) {
+        setError("Please enter a valid ETH amount.");
+        return;
+      }
+
+      // Call the smart contract 'buyTokens' function
+      const contract = await getContract();
+      const tx = await contract.buyTokens(await contract.signer.getAddress(), {
+        value: ethers.utils.parseEther(ethAmount),
+      });
+
       await tx.wait();
-      alert("Tokens purchased successfully!");
-    } catch (error) {
-      console.error("Transaction failed:", error);
-      alert("Transaction failed!");
+      setTransactionHash(tx.hash);
+
+      // Optionally, call your backend API to log the purchase
+      await axios.post("http://localhost:3000/api/purchase", {
+        buyerAddress: await contract.signer.getAddress(),
+        ethAmount,
+      });
+    } catch (err) {
+      console.error(err);
+      setError("Transaction failed. Check console for details.");
     }
-  }
+  };
 
   return (
-    <div>
-      <h2>Reach Token Sale</h2>
-      <button onClick={handleConnect}>
-        {account ? `Connected: ${account}` : "Connect Wallet"}
+    <div style={{ textAlign: "center", marginTop: "50px" }}>
+      <h2>Purchase Reach Tokens</h2>
+      <p>Enter the amount of ETH you want to spend:</p>
+      <input
+        type="text"
+        value={ethAmount}
+        onChange={(e) => setEthAmount(e.target.value)}
+        placeholder="ETH Amount"
+        style={{ padding: "10px", marginBottom: "10px" }}
+      />
+      <br />
+      <button
+        onClick={handlePurchase}
+        style={{
+          padding: "10px 20px",
+          backgroundColor: "#007bff",
+          color: "#fff",
+          border: "none",
+          cursor: "pointer",
+        }}
+      >
+        Buy Tokens
       </button>
-      <div>
-        <input
-          type="number"
-          placeholder="ETH amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
-        <button onClick={buyTokens}>Buy Tokens</button>
-      </div>
+
+      {transactionHash && (
+        <div style={{ marginTop: "20px", color: "green" }}>
+          <p>Transaction Successful!</p>
+          <a
+            href={`https://etherscan.io/tx/${transactionHash}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            View on Etherscan
+          </a>
+        </div>
+      )}
+
+      {error && (
+        <div style={{ marginTop: "20px", color: "red" }}>
+          <p>{error}</p>
+        </div>
+      )}
     </div>
   );
-}
+};
 
 export default TokenSale;
+
 
