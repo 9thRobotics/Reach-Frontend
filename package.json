@@ -9,6 +9,12 @@
     "preview": "vite preview",     // Preview production build
     "predeploy": "npm run build",  // Build before deployment
     "deploy": "gh-pages -d dist"   // Deploy to GitHub Pages
+    "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js", 
+    "test": "echo \"Error: no test specified\" && exit 1"
+}
+
   },
   "dependencies": {
     "ethers": "^6.7.0",            // Ethers.js for interacting with the contract
