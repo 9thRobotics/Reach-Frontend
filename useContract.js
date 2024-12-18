@@ -1,26 +1,11 @@
 import { ethers } from "ethers";
 
-// Environment variables
-const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
-const INFURA_PROJECT_ID = import.meta.env.VITE_INFURA_PROJECT_ID;
+// Environment variables from .env file
+const CONTRACT_ADDRESS = "0x70FAC257fbadb2905cb9D30A3C6b1Bb3524b6E9E";
+const INFURA_PROJECT_ID = "e402796c27ef40fcae5f8d4ef688599f";
 
-// ABI for your Reach Token contract (replace with the actual ABI)
+// ABI for your Reach Token Contract (replace this with your actual ABI)
 const abi = [
-  // Example functions
-  {
-    "inputs": [],
-    "name": "name",
-    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
-    "stateMutability": "view",
-    "type": "function",
-  },
-  {
-    "inputs": [],
-    "name": "symbol",
-    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
-    "stateMutability": "view",
-    "type": "function",
-  },
   {
     "inputs": [{ "internalType": "address", "name": "recipient", "type": "address" }],
     "name": "buyTokens",
@@ -28,30 +13,35 @@ const abi = [
     "stateMutability": "payable",
     "type": "function",
   },
+  {
+    "inputs": [],
+    "name": "name",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "view",
+    "type": "function",
+  },
 ];
 
-// Initialize a provider using Infura
+// Initialize an Infura provider
 const provider = new ethers.providers.JsonRpcProvider(
   `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`
 );
 
-// Get signer (use MetaMask or Wallet Connect)
+// Wallet connection function (e.g., MetaMask)
 const getSigner = async () => {
   if (window.ethereum) {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    await provider.send("eth_requestAccounts", []);
-    return provider.getSigner();
+    const web3Provider = new ethers.providers.Web3Provider(window.ethereum);
+    await web3Provider.send("eth_requestAccounts", []); // Request wallet access
+    return web3Provider.getSigner();
   } else {
     throw new Error("MetaMask is not installed.");
   }
 };
 
-// Connect to the contract
+// Get smart contract instance
 const getContract = async () => {
   const signer = await getSigner();
   return new ethers.Contract(CONTRACT_ADDRESS, abi, signer);
 };
 
-// Export functions
 export { getContract };
-
