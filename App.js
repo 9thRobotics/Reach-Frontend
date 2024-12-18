@@ -1,39 +1,23 @@
-import React, { useEffect } from "react";
-import {
-  getTokenName,
-  getTokenSymbol,
-  getTotalSupply,
-  getBalance,
-  transferTokens,
-} from "./useContract";
+import React from "react";
+import TokenSale from "./TokenSale";
 
 function App() {
-  useEffect(() => {
-    const fetchData = async () => {
-      const name = await getTokenName();
-      const symbol = await getTokenSymbol();
-      const totalSupply = await getTotalSupply();
-      console.log(`Token Info: ${name} (${symbol})`);
-      console.log("Total Supply:", totalSupply);
-
-      // Replace with a wallet address to test balance
-      const balance = await getBalance("0xYourWalletAddressHere");
-      console.log("Your Balance:", balance);
-    };
-
-    fetchData();
-  }, []);
-
-  const handleTransfer = async () => {
-    const recipient = prompt("Enter recipient address:");
-    const amount = prompt("Enter amount to transfer:");
-    await transferTokens(recipient, amount);
-  };
-
   return (
-    <div>
-      <h1>Reach Token Frontend</h1>
-      <button onClick={handleTransfer}>Transfer Tokens</button>
+    <div style={{ fontFamily: "Arial, sans-serif", textAlign: "center", marginTop: "50px" }}>
+      <header>
+        <h1>Welcome to the Reach Token Sale</h1>
+        <p>
+          Purchase Reach Tokens securely using your ETH wallet. Powered by Web3.
+        </p>
+      </header>
+
+      <main>
+        <TokenSale />
+      </main>
+
+      <footer style={{ marginTop: "30px", fontSize: "0.9em", color: "#555" }}>
+        <p>&copy; 2024 9th Dimension Robotics. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
