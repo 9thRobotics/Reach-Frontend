@@ -1,31 +1,31 @@
-name: Deploy Backend
+name: Deploy Frontend to GitHub Pages
 
 on:
   push:
     branches:
-      - main
+      - main  # Triggers deployment on push to 'main' branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      CONTRACT_ADDRESS: ${{ secrets.CONTRACT_ADDRESS }}
-      INFURA_PROJECT_ID: ${{ secrets.INFURA_PROJECT_ID }}
-      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm install
 
-      - name: Start Backend
-        run: |
-          echo "Deploying Backend..."
-          npm run start
+      - name: Build Project
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
