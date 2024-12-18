@@ -1,96 +1,57 @@
 import { ethers } from "ethers";
 
-// Load environment variables
-const INFURA_PROJECT_ID = import.meta.env.VITE_INFURA_PROJECT_ID;
+// Environment variables
 const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
+const INFURA_PROJECT_ID = import.meta.env.VITE_INFURA_PROJECT_ID;
 
-// Import ABI (TokenABI.json must be in the same directory)
-import tokenABI from "./TokenABI.json";
+// ABI for your Reach Token contract (replace with the actual ABI)
+const abi = [
+  // Example functions
+  {
+    "inputs": [],
+    "name": "name",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "view",
+    "type": "function",
+  },
+  {
+    "inputs": [],
+    "name": "symbol",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "stateMutability": "view",
+    "type": "function",
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "recipient", "type": "address" }],
+    "name": "buyTokens",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function",
+  },
+];
 
-// Setup Ethereum Provider
+// Initialize a provider using Infura
 const provider = new ethers.providers.JsonRpcProvider(
   `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`
 );
 
-// Wallet Signer for Transactions
-const getSigner = () => {
-  const { ethereum } = window; // Metamask
-  if (!ethereum) {
-    alert("MetaMask is not installed. Please install it to use this feature.");
-    throw new Error("MetaMask not installed");
-  }
-  const provider = new ethers.providers.Web3Provider(ethereum);
-  return provider.getSigner();
-};
-
-// Connect to the Smart Contract
-const contract = new ethers.Contract(CONTRACT_ADDRESS, tokenABI, provider);
-
-// Utility Functions
-
-// 1. Fetch Token Name
-export const getTokenName = async () => {
-  try {
-    const name = await contract.name();
-    console.log("Token Name:", name);
-    return name;
-  } catch (error) {
-    console.error("Error fetching token name:", error);
+// Get signer (use MetaMask or Wallet Connect)
+const getSigner = async () => {
+  if (window.ethereum) {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    return provider.getSigner();
+  } else {
+    throw new Error("MetaMask is not installed.");
   }
 };
 
-// 2. Fetch Token Symbol
-export const getTokenSymbol = async () => {
-  try {
-    const symbol = await contract.symbol();
-    console.log("Token Symbol:", symbol);
-    return symbol;
-  } catch (error) {
-    console.error("Error fetching token symbol:", error);
-  }
+// Connect to the contract
+const getContract = async () => {
+  const signer = await getSigner();
+  return new ethers.Contract(CONTRACT_ADDRESS, abi, signer);
 };
 
-// 3. Fetch Total Supply
-export const getTotalSupply = async () => {
-  try {
-    const totalSupply = await contract.totalSupply();
-    console.log("Total Supply:", ethers.utils.formatUnits(totalSupply, 18));
-    return totalSupply;
-  } catch (error) {
-    console.error("Error fetching total supply:", error);
-  }
-};
-
-// 4. Fetch Balance of an Address
-export const getBalance = async (address) => {
-  try {
-    const balance = await contract.balanceOf(address);
-    console.log(
-      `Balance of ${address}:`,
-      ethers.utils.formatUnits(balance, 18)
-    );
-    return balance;
-  } catch (error) {
-    console.error("Error fetching balance:", error);
-  }
-};
-
-// 5. Transfer Tokens (Requires Wallet Connection)
-export const transferTokens = async (to, amount) => {
-  try {
-    const signer = getSigner();
-    const contractWithSigner = contract.connect(signer);
-
-    const tx = await contractWithSigner.transfer(
-      to,
-      ethers.utils.parseUnits(amount.toString(), 18)
-    );
-    await tx.wait();
-
-    console.log("Tokens transferred:", tx.hash);
-    return tx.hash;
-  } catch (error) {
-    console.error("Error transferring tokens:", error);
-  }
-};
+// Export functions
+export { getContract };
 
