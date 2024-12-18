@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { getContract } from "./useContract";
-import axios from "axios";
+import { ethers } from "ethers";
 
 const TokenSale = () => {
   const [ethAmount, setEthAmount] = useState("");
@@ -8,40 +8,35 @@ const TokenSale = () => {
   const [error, setError] = useState("");
 
   const handlePurchase = async () => {
-    setError("");
     setTransactionHash("");
+    setError("");
     try {
       if (!ethAmount || isNaN(ethAmount)) {
-        setError("Please enter a valid ETH amount.");
+        setError("Enter a valid ETH amount.");
         return;
       }
 
-      // Call the smart contract 'buyTokens' function
       const contract = await getContract();
-      const tx = await contract.buyTokens(await contract.signer.getAddress(), {
+      const signerAddress = await contract.signer.getAddress();
+
+      const tx = await contract.buyTokens(signerAddress, {
         value: ethers.utils.parseEther(ethAmount),
       });
 
       await tx.wait();
       setTransactionHash(tx.hash);
-
-      // Optionally, call your backend API to log the purchase
-      await axios.post("http://localhost:3000/api/purchase", {
-        buyerAddress: await contract.signer.getAddress(),
-        ethAmount,
-      });
     } catch (err) {
       console.error(err);
-      setError("Transaction failed. Check console for details.");
+      setError("Transaction failed. Please check your wallet and try again.");
     }
   };
 
   return (
     <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h2>Purchase Reach Tokens</h2>
-      <p>Enter the amount of ETH you want to spend:</p>
+      <h2>Buy Reach Tokens</h2>
+      <p>Enter the amount of ETH to spend:</p>
       <input
-        type="text"
+        type="number"
         value={ethAmount}
         onChange={(e) => setEthAmount(e.target.value)}
         placeholder="ETH Amount"
@@ -69,7 +64,7 @@ const TokenSale = () => {
             target="_blank"
             rel="noreferrer"
           >
-            View on Etherscan
+            View Transaction on Etherscan
           </a>
         </div>
       )}
