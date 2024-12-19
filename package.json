@@ -2,19 +2,13 @@
   "name": "reach-frontend",
   "version": "0.1.0",
   "private": true,
-"scripts": {
   "scripts": {
-  "dev": "nodemon index.js", // Starts the backend server for development
-  "start": "node index.js",  // Starts the backend server in production
-  "test": "echo \"Error: no test specified\" && exit 1"
-}
-  "dev": "vite",                 // Start development server
-  "start": "vite",               // Alias for dev
-  "build": "vite build",         // Build production-ready files
-  "preview": "vite preview",     // Preview production build
-  "predeploy": "npm run build",  // Build before deployment
-  "deploy": "gh-pages -d dist"   // Deploy to GitHub Pages
-},
+    "dev": "vite",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "ethers": "^6.7.0",
