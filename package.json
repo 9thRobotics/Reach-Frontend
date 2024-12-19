@@ -2,13 +2,14 @@
   "name": "reach-frontend",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "start": "vite",
-    "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+"scripts": {
+  "dev": "vite",                 // Start development server
+  "start": "vite",               // Alias for dev
+  "build": "vite build",         // Build production-ready files
+  "preview": "vite preview",     // Preview production build
+  "predeploy": "npm run build",  // Build before deployment
+  "deploy": "gh-pages -d dist"   // Deploy to GitHub Pages
+},
   },
   "dependencies": {
     "ethers": "^6.7.0",
