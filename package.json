@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "private": true,
 "scripts": {
+  "scripts": {
+  "dev": "nodemon index.js", // Starts the backend server for development
+  "start": "node index.js",  // Starts the backend server in production
+  "test": "echo \"Error: no test specified\" && exit 1"
+}
   "dev": "vite",                 // Start development server
   "start": "vite",               // Alias for dev
   "build": "vite build",         // Build production-ready files
