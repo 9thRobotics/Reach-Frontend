@@ -1,83 +1,64 @@
 import React, { useState } from "react";
-import { getContract } from "./useContract";
-import { ethers } from "ethers";
 
-const TokenSale = () => {
+function TokenSale() {
   const [ethAmount, setEthAmount] = useState("");
-  const [transactionHash, setTransactionHash] = useState("");
-  const [error, setError] = useState("");
+  const [recipientAddress, setRecipientAddress] = useState("");
+  const [message, setMessage] = useState("");
 
   const handlePurchase = async () => {
-    setTransactionHash("");
-    setError("");
     try {
-      if (!ethAmount || isNaN(ethAmount)) {
-        setError("Enter a valid ETH amount.");
-        return;
-      }
-
-      const contract = await getContract();
-      const signerAddress = await contract.signer.getAddress();
-
-      const tx = await contract.buyTokens(signerAddress, {
-        value: ethers.utils.parseEther(ethAmount),
+      const response = await fetch("http://localhost:3000/buyTokens", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          recipient: recipientAddress,
+          amount: ethAmount,
+        }),
       });
 
-      await tx.wait();
-      setTransactionHash(tx.hash);
-    } catch (err) {
-      console.error(err);
-      setError("Transaction failed. Please check your wallet and try again.");
+      if (response.ok) {
+        setMessage("Token purchase successful!");
+      } else {
+        const error = await response.json();
+        setMessage(`Error: ${error.message}`);
+      }
+    } catch (error) {
+      setMessage(`Error: ${error.message}`);
     }
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h2>Buy Reach Tokens</h2>
-      <p>Enter the amount of ETH to spend:</p>
-      <input
-        type="number"
-        value={ethAmount}
-        onChange={(e) => setEthAmount(e.target.value)}
-        placeholder="ETH Amount"
-        style={{ padding: "10px", marginBottom: "10px" }}
-      />
+    <div>
+      <h2>Purchase Tokens</h2>
+      <label>
+        Recipient Address:
+        <input
+          type="text"
+          value={recipientAddress}
+          onChange={(e) => setRecipientAddress(e.target.value)}
+          placeholder="0xRecipientAddress"
+        />
+      </label>
       <br />
-      <button
-        onClick={handlePurchase}
-        style={{
-          padding: "10px 20px",
-          backgroundColor: "#007bff",
-          color: "#fff",
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        Buy Tokens
-      </button>
-
-      {transactionHash && (
-        <div style={{ marginTop: "20px", color: "green" }}>
-          <p>Transaction Successful!</p>
-          <a
-            href={`https://etherscan.io/tx/${transactionHash}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            View Transaction on Etherscan
-          </a>
-        </div>
-      )}
-
-      {error && (
-        <div style={{ marginTop: "20px", color: "red" }}>
-          <p>{error}</p>
-        </div>
-      )}
+      <label>
+        ETH Amount:
+        <input
+          type="number"
+          value={ethAmount}
+          onChange={(e) => setEthAmount(e.target.value)}
+          placeholder="0.1"
+        />
+      </label>
+      <br />
+      <button onClick={handlePurchase}>Buy Tokens</button>
+      <p>{message}</p>
     </div>
   );
-};
+}
 
 export default TokenSale;
+
 
 
