@@ -4,8 +4,6 @@ This is the front-end application for the Reach Token ecosystem. It allows users
 Install dependencies:
    ```bash
    npm install
-
-
 ### Installation Steps
 1. Clone the repository:
    ```bash
