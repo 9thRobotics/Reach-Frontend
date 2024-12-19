@@ -1,8 +1,6 @@
 import React from "react";
 import TokenSale from "./TokenSale";
 
-console.log("Node.js is running successfully!"); // This will log when the script is loaded.
-
 function App() {
   return (
     <div style={{ fontFamily: "Arial, sans-serif", textAlign: "center", marginTop: "50px" }}>
@@ -25,6 +23,7 @@ function App() {
 }
 
 export default App;
+
 
 
 
