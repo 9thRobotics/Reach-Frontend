@@ -4,6 +4,14 @@ import App from "./App";
 
 console.log("Node.js is running successfully!");
 
+require('dotenv').config();
+
+const apiKey = process.env.API_KEY;
+const databaseUrl = process.env.DATABASE_URL;
+const port = process.env.PORT || 3000;
+const secretKey = process.env.SECRET_KEY;
+
+// Your application logic here
 ReactDOM.render(
   <React.StrictMode>
     <App />
