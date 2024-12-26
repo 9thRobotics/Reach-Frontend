@@ -26,3 +26,19 @@ dist/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Ignore system files
+AppData/
+*.jtx
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node.js dependencies
+node_modules/
+
+# Build files
+dist/
+build/
+
