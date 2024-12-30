@@ -48,6 +48,7 @@ app.get('*', (req, res) => {
 });
 
 // Start the server
+const API_BASE_URL = "https://new-reach-backend-d530ec69bf02.herokuapp.com/";
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
