@@ -1,0 +1,32 @@
+// src/components/SomeComponent.js
+import React, { useEffect, useState } from 'react';
+import { fetchData } from '../api';
+
+const SomeComponent = () => {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const result = await fetchData('some-endpoint');
+        setData(result);
+      } catch (error) {
+        // Handle error
+      }
+    };
+
+    getData();
+  }, []);
+
+  return (
+    <div>
+      {data ? (
+        <pre>{JSON.stringify(data, null, 2)}</pre>
+      ) : (
+        <p>Loading data...</p>
+      )}
+    </div>
+  );
+};
+
+export default SomeComponent;
