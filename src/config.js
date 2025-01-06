@@ -3,4 +3,6 @@ const API_BASE_URL =
     ? "https://new-reach-backend.herokuapp.com" // Production URL
     : "http://localhost:5000"; // Local development URL
 
-export default API_BASE_URL;
+   export const API_BASE_URL = "https://new-reach-backend.herokuapp.com";
+
+ export default API_BASE_URL;
