@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import axios from 'axios';
+import API_BASE_URL from './config'; // Adjust the path if necessary
 
 const Tokenomics = () => {
   // States for stats, chart data, loading, and errors
@@ -8,9 +9,6 @@ const Tokenomics = () => {
   const [chartData, setChartData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // API Base URL (use environment variable or fallback to default)
-  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://api.reachtoken.io';
 
   // Fetch token stats and price history
   useEffect(() => {
@@ -49,7 +47,7 @@ const Tokenomics = () => {
     };
 
     fetchTokenData();
-  }, [API_BASE_URL]);
+  }, []);
 
   // Loading and error handling
   if (loading) {
