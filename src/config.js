@@ -1,6 +1,3 @@
-const API_BASE_URL =
-  process.env.NODE_ENV === "production"
-    ? "https://new-reach-backend.herokuapp.com"
-    : "http://localhost:5000";
+const API_BASE_URL = 'http://localhost:3000'; // For local development
 
 export default API_BASE_URL;
