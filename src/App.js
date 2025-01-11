@@ -1,4 +1,5 @@
 import React from 'react';
+import Tokenomics from './components/Tokenomics'; // Adjust the path if necessary
 
 const Hero = () => (
   <div className="bg-gray-900 text-white h-screen flex flex-col justify-center items-center">
@@ -12,7 +13,14 @@ const Hero = () => (
 );
 
 function App() {
-  return <Hero />;
+  return (
+    <div>
+      <h1>Welcome to the Dashboard</h1>
+      <Tokenomics />
+      <Hero />
+      {/* Add other components here */}
+    </div>
+  );
 }
 
 export default App;
