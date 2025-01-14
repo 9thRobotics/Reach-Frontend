@@ -1,62 +1,200 @@
-<script>
-    // Check if MetaMask is installed
-    if (typeof window.ethereum !== 'undefined') {
-        console.log('MetaMask is installed!');
-    } else {
-        alert('MetaMask is not installed. Please install MetaMask to use this feature.');
-    }
-
-    // Connect to MetaMask
-    async function connectWallet() {
-        try {
-            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-            console.log("Connected account:", accounts[0]);
-            // Store the current account
-            window.account = accounts[0];
-        } catch (err) {
-            console.error("Wallet connection failed:", err);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReachSwap - Inspired by PancakeSwap</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a2e;
+            color: #fff;
+            margin: 0;
+            padding: 0;
         }
-    }
 
-    // Function to buy tokens
-    async function buyTokens() {
-        const buyAmount = document.getElementById('buyAmount').value;
-        // Interact with your smart contract to buy tokens
-        // This is a placeholder - replace with your contract interaction logic
-        alert(`Buying tokens with ${buyAmount} ETH`);
-    }
+        header {
+            background-color: #24263b;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    // Function to stake tokens
-    async function stakeTokens() {
-        const stakeAmount = document.getElementById('stakeAmount').value;
-        // Interact with your smart contract to stake tokens
-        // This is a placeholder - replace with your contract interaction logic
-        alert(`Staking ${stakeAmount} tokens`);
-    }
+        header .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #32cd32;
+        }
 
-    // Function to unstake tokens
-    async function unstakeTokens() {
-        // Interact with your smart contract to unstake tokens
-        // This is a placeholder - replace with your contract interaction logic
-        alert('Unstaking tokens');
-    }
+        header nav ul {
+            list-style: none;
+            display: flex;
+            gap: 15px;
+        }
 
-    // Function to swap tokens
-    async function swapTokens() {
-        const swapFromAmount = document.getElementById('swapFromAmount').value;
-        const swapFromToken = document.getElementById('swapFromToken').value;
-        const swapToToken = document.getElementById('swapToToken').value;
-        // Interact with your smart contract to swap tokens
-        // This is a placeholder - replace with your contract interaction logic
-        alert(`Swapping ${swapFromAmount} ${swapFromToken} for ${swapToToken}`);
-    }
+        header nav ul li {
+            position: relative;
+        }
 
-    // Event listeners for the buttons
-    document.getElementById("buyTokenButton").addEventListener("click", buyTokens);
-    document.getElementById("stakeTokenButton").addEventListener("click", stakeTokens);
-    document.getElementById("unstakeTokenButton").addEventListener("click", unstakeTokens);
-    document.getElementById("swapButton").addEventListener("click", swapTokens);
+        header nav ul li a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+        }
 
-    // Connect wallet on page load
-    connectWallet();
-</script>
+        header nav ul li:hover .dropdown {
+            display: block;
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            background-color: #343650;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .dropdown a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            padding: 5px;
+        }
+
+        .dropdown a:hover {
+            color: #32cd32;
+        }
+
+        .content {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #32cd32;
+            color: #121212;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #28a428;
+        }
+
+        .card {
+            background-color: #2a2d49;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 500px;
+            text-align: left;
+        }
+
+        input, select {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin: 10px 0;
+            width: 100%;
+            background-color: #343650;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">ReachSwap</div>
+        <nav>
+            <ul>
+                <li><a href="#trade">Trade</a>
+                    <div class="dropdown">
+                        <a href="#swap">Swap</a>
+                        <a href="#liquidity">Liquidity</a>
+                    </div>
+                </li>
+                <li><a href="#stake">Stake</a></li>
+                <li><a href="#governance">Governance</a></li>
+                <li><a href="#analytics">Analytics</a></li>
+            </ul>
+        </nav>
+        <button id="connectWallet">Connect Wallet</button>
+    </header>
+
+    <!-- Main Content -->
+    <div class="content">
+        <h1>Welcome to ReachSwap</h1>
+        <p>Swap, stake, and govern with the Reach Token.</p>
+    </div>
+
+    <!-- Swap Section -->
+    <div id="swap" class="card">
+        <h2>Swap Tokens</h2>
+        <label for="fromToken">From:</label>
+        <select id="fromToken">
+            <option value="reach">Reach Token</option>
+            <option value="eth">ETH</option>
+        </select>
+        <input type="number" id="fromAmount" placeholder="Amount">
+        <label for="toToken">To:</label>
+        <select id="toToken">
+            <option value="eth">ETH</option>
+            <option value="reach">Reach Token</option>
+        </select>
+        <input type="number" id="toAmount" placeholder="Amount" readonly>
+        <button>Swap</button>
+    </div>
+
+    <!-- Liquidity Section -->
+    <div id="liquidity" class="card">
+        <h2>Add Liquidity</h2>
+        <input type="number" placeholder="Amount of Reach Token">
+        <input type="number" placeholder="Amount of ETH">
+        <button>Add Liquidity</button>
+    </div>
+
+    <!-- Staking Section -->
+    <div id="stake" class="card">
+        <h2>Stake Tokens</h2>
+        <input type="number" placeholder="Enter amount to stake">
+        <button>Stake</button>
+        <button>Unstake</button>
+    </div>
+
+    <!-- Governance Section -->
+    <div id="governance" class="card">
+        <h2>Governance</h2>
+        <textarea placeholder="Submit your proposal"></textarea>
+        <button>Submit Proposal</button>
+    </div>
+
+    <!-- Analytics Section -->
+    <div id="analytics" class="card">
+        <h2>Analytics</h2>
+        <p>Track token performance and stats.</p>
+        <p>Market Cap: $1,000,000</p>
+        <p>Staking APY: 10%</p>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Wallet Connection
+        document.getElementById("connectWallet").addEventListener("click", async () => {
+            if (window.ethereum) {
+                try {
+                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                    alert(`Wallet Connected: ${accounts[0]}`);
+                } catch (error) {
+                    alert("Connection failed: " + error.message);
+                }
+            } else {
+                alert("MetaMask not detected. Please install it.");
+            }
+        });
+    </script>
+</body>
+</html>
