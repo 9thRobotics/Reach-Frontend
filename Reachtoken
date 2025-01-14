@@ -1,118 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Token Sale, Staking, and Exchange</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: #fff;
-            text-align: center;
-            padding: 20px;
-        }
-        .section {
-            margin: 20px 0;
-            padding: 20px;
-            border: 1px solid #32cd32;
-            border-radius: 10px;
-            background: #1e1e1e;
-        }
-        input {
-            margin: 10px;
-            padding: 10px;
-            border: 1px solid #32cd32;
-            border-radius: 5px;
-            background: #1e1e1e;
-            color: #fff;
-        }
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #32cd32;
-            color: #121212;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #28a428;
-        }
-    </style>
-</head>
-<body>
-    <h1>Reach Token Platform</h1>
+<script>
+    // Check if MetaMask is installed
+    if (typeof window.ethereum !== 'undefined') {
+        console.log('MetaMask is installed!');
+    } else {
+        alert('MetaMask is not installed. Please install MetaMask to use this feature.');
+    }
 
-    <!-- Token Sale Section -->
-    <div class="section">
-        <h2>Buy Tokens</h2>
-        <p>Connect your wallet and buy Reach Tokens.</p>
-        <input type="number" id="buyAmount" placeholder="Enter ETH amount">
-        <button id="buyTokenButton">Buy Tokens</button>
-    </div>
-
-    <!-- Staking Section -->
-    <div class="section">
-        <h2>Stake Tokens</h2>
-        <p>Stake your Reach Tokens and earn rewards.</p>
-        <input type="number" id="stakeAmount" placeholder="Enter token amount to stake">
-        <button id="stakeTokenButton">Stake Tokens</button>
-        <button id="unstakeTokenButton">Unstake Tokens</button>
-    </div>
-
-    <!-- Exchange Section -->
-    <div class="section">
-        <h2>Exchange</h2>
-        <p>Swap Reach Tokens with other tokens.</p>
-        <input type="number" id="swapFromAmount" placeholder="Enter amount to swap">
-        <select id="swapFromToken">
-            <option value="reach">Reach Token</option>
-            <option value="eth">ETH</option>
-        </select>
-        <p>For:</p>
-        <input type="number" id="swapToAmount" placeholder="Amount to receive" readonly>
-        <select id="swapToToken">
-            <option value="eth">ETH</option>
-            <option value="reach">Reach Token</option>
-        </select>
-        <button id="swapButton">Swap Tokens</button>
-    </div>
-
-    <script>
-        // Placeholder functions for wallet connection and actions
-        async function connectWallet() {
-            if (window.ethereum) {
-                try {
-                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-                    console.log("Connected account:", accounts[0]);
-                } catch (err) {
-                    console.error("Wallet connection failed:", err);
-                }
-            } else {
-                alert("MetaMask not detected. Please install it.");
-            }
+    // Connect to MetaMask
+    async function connectWallet() {
+        try {
+            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+            console.log("Connected account:", accounts[0]);
+            // Store the current account
+            window.account = accounts[0];
+        } catch (err) {
+            console.error("Wallet connection failed:", err);
         }
+    }
 
-        async function buyTokens() {
-            alert("Buy tokens logic here");
-        }
+    // Function to buy tokens
+    async function buyTokens() {
+        const buyAmount = document.getElementById('buyAmount').value;
+        // Interact with your smart contract to buy tokens
+        // This is a placeholder - replace with your contract interaction logic
+        alert(`Buying tokens with ${buyAmount} ETH`);
+    }
 
-        async function stakeTokens() {
-            alert("Stake tokens logic here");
-        }
+    // Function to stake tokens
+    async function stakeTokens() {
+        const stakeAmount = document.getElementById('stakeAmount').value;
+        // Interact with your smart contract to stake tokens
+        // This is a placeholder - replace with your contract interaction logic
+        alert(`Staking ${stakeAmount} tokens`);
+    }
 
-        async function unstakeTokens() {
-            alert("Unstake tokens logic here");
-        }
+    // Function to unstake tokens
+    async function unstakeTokens() {
+        // Interact with your smart contract to unstake tokens
+        // This is a placeholder - replace with your contract interaction logic
+        alert('Unstaking tokens');
+    }
 
-        async function swapTokens() {
-            alert("Swap tokens logic here");
-        }
+    // Function to swap tokens
+    async function swapTokens() {
+        const swapFromAmount = document.getElementById('swapFromAmount').value;
+        const swapFromToken = document.getElementById('swapFromToken').value;
+        const swapToToken = document.getElementById('swapToToken').value;
+        // Interact with your smart contract to swap tokens
+        // This is a placeholder - replace with your contract interaction logic
+        alert(`Swapping ${swapFromAmount} ${swapFromToken} for ${swapToToken}`);
+    }
 
-        document.getElementById("buyTokenButton").addEventListener("click", buyTokens);
-        document.getElementById("stakeTokenButton").addEventListener("click", stakeTokens);
-        document.getElementById("unstakeTokenButton").addEventListener("click", unstakeTokens);
-        document.getElementById("swapButton").addEventListener("click", swapTokens);
-    </script>
-</body>
-</html>
+    // Event listeners for the buttons
+    document.getElementById("buyTokenButton").addEventListener("click", buyTokens);
+    document.getElementById("stakeTokenButton").addEventListener("click", stakeTokens);
+    document.getElementById("unstakeTokenButton").addEventListener("click", unstakeTokens);
+    document.getElementById("swapButton").addEventListener("click", swapTokens);
+
+    // Connect wallet on page load
+    connectWallet();
+</script>
