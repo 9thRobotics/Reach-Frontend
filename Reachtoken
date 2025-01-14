@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Sale, Staking, and Exchange</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #32cd32;
+            border-radius: 10px;
+            background: #1e1e1e;
+        }
+        input {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #32cd32;
+            border-radius: 5px;
+            background: #1e1e1e;
+            color: #fff;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #32cd32;
+            color: #121212;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #28a428;
+        }
+    </style>
+</head>
+<body>
+    <h1>Reach Token Platform</h1>
+
+    <!-- Token Sale Section -->
+    <div class="section">
+        <h2>Buy Tokens</h2>
+        <p>Connect your wallet and buy Reach Tokens.</p>
+        <input type="number" id="buyAmount" placeholder="Enter ETH amount">
+        <button id="buyTokenButton">Buy Tokens</button>
+    </div>
+
+    <!-- Staking Section -->
+    <div class="section">
+        <h2>Stake Tokens</h2>
+        <p>Stake your Reach Tokens and earn rewards.</p>
+        <input type="number" id="stakeAmount" placeholder="Enter token amount to stake">
+        <button id="stakeTokenButton">Stake Tokens</button>
+        <button id="unstakeTokenButton">Unstake Tokens</button>
+    </div>
+
+    <!-- Exchange Section -->
+    <div class="section">
+        <h2>Exchange</h2>
+        <p>Swap Reach Tokens with other tokens.</p>
+        <input type="number" id="swapFromAmount" placeholder="Enter amount to swap">
+        <select id="swapFromToken">
+            <option value="reach">Reach Token</option>
+            <option value="eth">ETH</option>
+        </select>
+        <p>For:</p>
+        <input type="number" id="swapToAmount" placeholder="Amount to receive" readonly>
+        <select id="swapToToken">
+            <option value="eth">ETH</option>
+            <option value="reach">Reach Token</option>
+        </select>
+        <button id="swapButton">Swap Tokens</button>
+    </div>
+
+    <script>
+        // Placeholder functions for wallet connection and actions
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                    console.log("Connected account:", accounts[0]);
+                } catch (err) {
+                    console.error("Wallet connection failed:", err);
+                }
+            } else {
+                alert("MetaMask not detected. Please install it.");
+            }
+        }
+
+        async function buyTokens() {
+            alert("Buy tokens logic here");
+        }
+
+        async function stakeTokens() {
+            alert("Stake tokens logic here");
+        }
+
+        async function unstakeTokens() {
+            alert("Unstake tokens logic here");
+        }
+
+        async function swapTokens() {
+            alert("Swap tokens logic here");
+        }
+
+        document.getElementById("buyTokenButton").addEventListener("click", buyTokens);
+        document.getElementById("stakeTokenButton").addEventListener("click", stakeTokens);
+        document.getElementById("unstakeTokenButton").addEventListener("click", unstakeTokens);
+        document.getElementById("swapButton").addEventListener("click", swapTokens);
+    </script>
+</body>
+</html>
