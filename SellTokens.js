@@ -14,7 +14,7 @@ const SellTokens = ({ userWallet }) => {
 
         setIsSelling(true);
         try {
-            const response = await fetch("https://your-backend-url.com/sell", {
+            const response = await fetch("https://new-reach-backend-9th-robotics-s-projects.vercel.app/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
