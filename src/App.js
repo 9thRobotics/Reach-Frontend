@@ -22,5 +22,19 @@ function App() {
     </div>
   );
 }
+import React from "react";
+import BuySellTokens from "./components/BuySellTokens";
+
+function App() {
+    return (
+        <div className="App">
+            <h1>Welcome to Reach Token</h1>
+            <BuySellTokens />
+        </div>
+    );
+}
+
+export default App;
+
 
 export default App;
