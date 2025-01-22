@@ -1,6 +1,3 @@
-import React from 'react';
-import Tokenomics from './components/Tokenomics'; // Adjust the path if necessary
-
 const Hero = () => (
   <div className="bg-gray-900 text-white h-screen flex flex-col justify-center items-center">
     <h1 className="text-5xl font-bold mb-4">Building the Future, One Robot at a Time</h1>
@@ -11,30 +8,3 @@ const Hero = () => (
     </div>
   </div>
 );
-
-function App() {
-  return (
-    <div>
-      <h1>Welcome to the Dashboard</h1>
-      <Tokenomics />
-      <Hero />
-      {/* Add other components here */}
-    </div>
-  );
-}
-import React from "react";
-import BuySellTokens from "./components/BuySellTokens";
-
-function App() {
-    return (
-        <div className="App">
-            <h1>Welcome to Reach Token</h1>
-            <BuySellTokens />
-        </div>
-    );
-}
-
-export default App;
-
-
-export default App;
