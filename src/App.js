@@ -1,6 +1,7 @@
 import React from 'react';
-import Tokenomics from './components/Tokenomics'; // Adjust the path if necessary
-import Hero from './components/Hero'; // Adjust the path if necessary
+import Tokenomics from './components/Tokenomics';
+import Hero from './components/Hero';
+import BuySellTokens from './components/BuySellTokens';
 
 function App() {
   return (
@@ -8,6 +9,10 @@ function App() {
       <h1>Welcome to the Dashboard</h1>
       <Tokenomics />
       <Hero />
+      <div className="App">
+        <h1>Welcome to Reach Token</h1>
+        <BuySellTokens />
+      </div>
       {/* Add other components here */}
     </div>
   );
