@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import axios from 'axios';
-import API_BASE_URL from './config'; // Adjust the path if necessary
+import API_BASE_URL from '../config'; // Adjust the path if necessary
 
 const Tokenomics = () => {
-  // States for stats, chart data, loading, and errors
   const [stats, setStats] = useState({ totalSupply: 0, circulatingSupply: 0, price: 0 });
   const [chartData, setChartData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch token stats and price history
   useEffect(() => {
     const fetchTokenData = async () => {
       setLoading(true);
@@ -49,7 +47,6 @@ const Tokenomics = () => {
     fetchTokenData();
   }, []);
 
-  // Loading and error handling
   if (loading) {
     return <p>Loading tokenomics data...</p>;
   }
@@ -58,7 +55,6 @@ const Tokenomics = () => {
     return <p style={{ color: 'red' }}>{error}</p>;
   }
 
-  // Chart options
   const chartOptions = {
     responsive: true,
     scales: {
