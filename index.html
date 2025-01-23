@@ -1,1 +1,40 @@
+async function buyTokens() {
+    if (!userAccount) {
+        alert("Please connect your wallet first.");
+        return;
+    }
 
+    let reachAmount = prompt("Enter the number of Reach Tokens you want to buy:");
+
+    if (!reachAmount || isNaN(reachAmount) || reachAmount <= 0) {
+        alert("Invalid amount.");
+        return;
+    }
+
+    try {
+        const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd");
+        const data = await response.json();
+        const ethPrice = data.ethereum.usd;  // Get ETH price in USD
+
+        const reachPriceUSD = 27;  // Fixed price for 1 Reach Token
+        const ethCost = (reachAmount * reachPriceUSD) / ethPrice;  // Convert to ETH
+
+        const confirmPurchase = confirm(`You are buying ${reachAmount} REACH for ${ethCost.toFixed(6)} ETH. Confirm?`);
+        if (!confirmPurchase) return;
+
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+        const tx = await contract.buyTokens({
+            value: ethers.utils.parseEther(ethCost.toString())  // Send the correct ETH amount
+        });
+
+        alert("Transaction sent! Waiting for confirmation...");
+        await tx.wait();
+        alert(`Purchase successful! You received ${reachAmount} REACH.`);
+    } catch (error) {
+        console.error("Transaction failed:", error);
+        alert(`Transaction failed. Reason: ${error.message}`);
+    }
+}
