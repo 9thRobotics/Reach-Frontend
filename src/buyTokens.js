@@ -78,6 +78,22 @@ async function fetchETHPrice() {
     }
 }
 
+// Fetch Reach Price from contract
+async function fetchReachPrice() {
+    const contract = new web3.eth.Contract(ContractABI, contractAddress);
+    const dynamicPrice = await contract.methods.getDynamicPrice().call();
+    return dynamicPrice;  // Returns current Reach 9D-RC price in USD
+}
+
+// Update Reach 9D-RC amount based on ETH input
+async function updateReachAmount(ethAmount) {
+    const ethPriceUSD = await fetchETHPrice();
+    const reachPriceUSD = await fetchReachPrice();
+
+    const reachAmount = (ethAmount * ethPriceUSD) / reachPriceUSD;
+    document.getElementById("reachTokenAmount").innerText = reachAmount.toFixed(2);
+}
+
 // Update ETH cost when user enters Reach Token amount
 document.getElementById('reachAmount').addEventListener('input', function() {
     const reachAmount = this.value;
@@ -104,7 +120,8 @@ document.getElementById('buyTokensForm').addEventListener('submit', async functi
 async function buyTokens() {
     const ethAmount = document.getElementById("ethAmount").value;
     const ethPriceUSD = await fetchETHPrice();
-    const reachAmount = (ethAmount * ethPriceUSD) / 27;
+    const reachPriceUSD = await fetchReachPrice();
+    const reachAmount = (ethAmount * ethPriceUSD) / reachPriceUSD;
 
     const contract = new web3.eth.Contract(ContractABI, contractAddress);
     await contract.methods.buyTokens().send({
@@ -112,7 +129,7 @@ async function buyTokens() {
         value: web3.utils.toWei(ethAmount, "ether"),
     });
 
-    alert(`You purchased ${reachAmount.toFixed(2)} Reach 9D-RC for ${ethAmount} ETH!`);
+    alert(`You purchased ${reachAmount.toFixed(2)} Reach 9D-RC at $${reachPriceUSD} per token!`);
 }
 
 // Fetch ETH price when page loads
