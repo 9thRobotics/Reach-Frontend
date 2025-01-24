@@ -109,16 +109,27 @@ document.getElementById('buyTokensForm').addEventListener('submit', async functi
 
 // Add buyTokens function
 async function buyTokens() {
-    const ethAmount = document.getElementById("ethAmount").value;
-    const ethPriceUSD = await fetchETHPrice();
-    const reachAmount = (ethAmount * ethPriceUSD) / reachPriceUSD;
+    try {
+        const ethAmount = document.getElementById("ethAmount").value;
+        const ethPriceUSD = await fetchETHPrice();
 
-    await contract.methods.buyTokens().send({
-        from: userAccount,
-        value: web3.utils.toWei(ethAmount, "ether"),
-    });
+        if (!ethAmount || ethAmount <= 0) {
+            throw new Error("Please enter a valid ETH amount.");
+        }
 
-    alert(`You purchased ${reachAmount.toFixed(2)} Reach 9D-RC at $${reachPriceUSD} per token!`);
+        const reachAmount = (ethAmount * ethPriceUSD) / reachPriceUSD;
+
+        const contract = new web3.eth.Contract(ContractABI, contractAddress);
+        await contract.methods.buyTokens().send({
+            from: userAccount,
+            value: web3.utils.toWei(ethAmount, "ether"),
+        });
+
+        alert(`You purchased ${reachAmount.toFixed(2)} Reach 9D-RC at $${reachPriceUSD} per token!`);
+    } catch (error) {
+        console.error("Transaction failed:", error);
+        alert("Transaction failed. Please try again.");
+    }
 }
 
 // Fetch ETH price when page loads
