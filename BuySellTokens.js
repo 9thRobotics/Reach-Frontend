@@ -118,8 +118,10 @@
             <h2>Buy Reach Tokens</h2>
             <form id="sellTokensForm">
                 <input type="text" id="walletAddress" placeholder="Your Wallet Address" required readonly>
-                <input type="number" id="ethAmount" placeholder="Amount of ETH" required>
-                <div id="reachAmountDisplay">Reach 9D-RC: 0</div>
+                <label>Amount of ETH:</label>
+                <input type="number" id="ethAmount" oninput="updateReachAmount(this.value)" required>
+                <label>You will receive:</label>
+                <span id="reachTokenAmount">0</span> Reach 9D-RC
                 <button type="submit">Buy Tokens</button>
             </form>
             <div id="message" class="message"></div>
@@ -229,11 +231,25 @@
         fetchGasFee(); // Initial fetch
 
         // Update Reach 9D-RC amount based on ETH input
-        document.getElementById('ethAmount').addEventListener('input', function() {
-            const ethAmount = this.value;
-            const reachAmount = ethAmount * exchangeRate;
-            document.getElementById('reachAmountDisplay').innerText = `Reach 9D-RC: ${reachAmount}`;
-        });
+        async function updateReachAmount(ethAmount) {
+            const ethPriceUSD = await fetchETHPrice(); // Get current ETH price in USD
+            const reachPriceUSD = 27; // Fixed price per Reach 9D-RC
+
+            const reachAmount = (ethAmount * ethPriceUSD) / reachPriceUSD;
+            document.getElementById("reachTokenAmount").innerText = reachAmount.toFixed(2);
+        }
+
+        // Fetch ETH Price
+        async function fetchETHPrice() {
+            try {
+                const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd");
+                const data = await response.json();
+                return data.ethereum.usd;
+            } catch (error) {
+                console.error("Failed to fetch ETH price:", error);
+                return 0;
+            }
+        }
 
         // Handle form submission for buying tokens
         document.getElementById('sellTokensForm').addEventListener('submit', async function (e) {
