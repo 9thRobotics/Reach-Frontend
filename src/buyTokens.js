@@ -100,6 +100,21 @@ document.getElementById('buyTokensForm').addEventListener('submit', async functi
     }
 });
 
+// Add buyTokens function
+async function buyTokens() {
+    const ethAmount = document.getElementById("ethAmount").value;
+    const ethPriceUSD = await fetchETHPrice();
+    const reachAmount = (ethAmount * ethPriceUSD) / 27;
+
+    const contract = new web3.eth.Contract(ContractABI, contractAddress);
+    await contract.methods.buyTokens().send({
+        from: userAccount,
+        value: web3.utils.toWei(ethAmount, "ether"),
+    });
+
+    alert(`You purchased ${reachAmount.toFixed(2)} Reach 9D-RC for ${ethAmount} ETH!`);
+}
+
 // Fetch ETH price when page loads
 async function updateETHPrice() {
     ethPrice = await fetchETHPrice();
