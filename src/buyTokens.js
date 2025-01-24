@@ -9,7 +9,7 @@ const ContractABI = [
 let web3;
 let userAccount = null;
 let ethPrice = 3000;  // Default ETH price (live fetch will update)
-let reachPriceUSD = 27;  // Fixed price of 1 Reach Token in USD
+const reachPriceUSD = 27;  // Fixed price of 1 Reach Token in USD
 
 // Contract address
 const contractAddress = '0x379d30d72a103b58cF00A6F5f8DBfe03C7bbf5Ef';
@@ -78,18 +78,9 @@ async function fetchETHPrice() {
     }
 }
 
-// Fetch Reach Price from contract
-async function fetchReachPrice() {
-    const contract = new web3.eth.Contract(ContractABI, contractAddress);
-    const dynamicPrice = await contract.methods.getDynamicPrice().call();
-    return dynamicPrice;  // Returns current Reach 9D-RC price in USD
-}
-
 // Update Reach 9D-RC amount based on ETH input
 async function updateReachAmount(ethAmount) {
     const ethPriceUSD = await fetchETHPrice();
-    const reachPriceUSD = await fetchReachPrice();
-
     const reachAmount = (ethAmount * ethPriceUSD) / reachPriceUSD;
     document.getElementById("reachTokenAmount").innerText = reachAmount.toFixed(2);
 }
@@ -105,12 +96,12 @@ document.getElementById('reachAmount').addEventListener('input', function() {
 document.getElementById('buyTokensForm').addEventListener('submit', async function (e) {
     e.preventDefault();
     const walletAddress = userAccount;
-    const reachAmount = document.getElementById('reachAmount').value;
-    const ethRequired = (reachAmount * reachPriceUSD) / ethPrice;
+    const ethAmount = document.getElementById('ethAmount').value;
+    const reachAmount = (ethAmount * await fetchETHPrice()) / reachPriceUSD;
 
     try {
-        await contract.methods.transfer('0xRecipientAddress', ethRequired).send({ from: walletAddress });
-        document.getElementById('message').innerText = 'Success! Tokens purchased.';
+        await contract.methods.transfer('0xRecipientAddress', reachAmount).send({ from: walletAddress });
+        document.getElementById('message').innerText = `Success! You purchased ${reachAmount.toFixed(2)} Reach 9D-RC.`;
     } catch (error) {
         document.getElementById('message').innerText = 'Failed to process the transaction. Please try again.';
     }
@@ -120,10 +111,8 @@ document.getElementById('buyTokensForm').addEventListener('submit', async functi
 async function buyTokens() {
     const ethAmount = document.getElementById("ethAmount").value;
     const ethPriceUSD = await fetchETHPrice();
-    const reachPriceUSD = await fetchReachPrice();
     const reachAmount = (ethAmount * ethPriceUSD) / reachPriceUSD;
 
-    const contract = new web3.eth.Contract(ContractABI, contractAddress);
     await contract.methods.buyTokens().send({
         from: userAccount,
         value: web3.utils.toWei(ethAmount, "ether"),
