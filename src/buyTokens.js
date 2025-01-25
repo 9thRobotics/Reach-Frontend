@@ -27,6 +27,10 @@ async function connectWallet() {
 
             // ✅ Initialize Contract After Wallet Connection
             contract = new web3.eth.Contract(ContractABI, contractAddress);
+
+            // Log the successful connection and contract initialization
+            console.log('Wallet connected:', userAccount);
+            console.log('Contract initialized:', contract);
         } catch (error) {
             console.error("Wallet connection failed:", error);
         }
@@ -41,6 +45,9 @@ async function disconnectWallet() {
     document.getElementById("walletAddress").value = "";
     connectWalletBtn.innerText = "Connect Your MetaMask Wallet";
     connectWalletBtn.onclick = connectWallet;
+
+    // Log the wallet disconnection
+    console.log('Wallet disconnected');
 }
 
 // Fetch ETH Price (Live from API)
@@ -48,7 +55,9 @@ async function fetchETHPrice() {
     try {
         const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
         const data = await response.json();
-        return data.ethereum.usd;
+        const ethPrice = data.ethereum.usd;
+        console.log('Fetched ETH price:', ethPrice);
+        return ethPrice;
     } catch (error) {
         console.error("Error fetching ETH price:", error);
         return 2700; // Default ETH price in case API fails
@@ -60,6 +69,7 @@ async function updateReachAmount(ethAmount) {
     const ethPriceUSD = await fetchETHPrice();
     const reachAmount = (ethAmount * ethPriceUSD) / reachPriceUSD;
     document.getElementById("reachTokenAmount").innerText = reachAmount.toFixed(2);
+    console.log('Updated Reach amount:', reachAmount);
 }
 
 // Update ETH cost when user enters Reach Token amount
@@ -67,6 +77,7 @@ document.getElementById('reachAmount').addEventListener('input', function() {
     const reachAmount = this.value;
     const ethRequired = (reachAmount * reachPriceUSD) / ethPrice;  // Convert Reach Token price to ETH
     document.getElementById('ethAmountDisplay').innerText = `ETH Required: ${ethRequired.toFixed(6)}`;
+    console.log('Updated ETH required:', ethRequired);
 });
 
 // Handle form submission for buying tokens
@@ -95,6 +106,8 @@ document.getElementById("buyTokensForm").addEventListener("submit", async functi
             gas: gasLimit // User-defined Gas Fee
         });
 
+        // Log the successful transaction
+        console.log('Transaction successful:', transaction);
         alert(`✅ Success! Transaction Hash: ${transaction.transactionHash}`);
     } catch (error) {
         console.error("❌ Transaction failed:", error);
@@ -115,11 +128,13 @@ async function buyTokens() {
         const reachAmount = (ethAmount * ethPriceUSD) / reachPriceUSD;
 
         const contract = new web3.eth.Contract(ContractABI, contractAddress);
-        await contract.methods.buyTokens().send({
+        const transaction = await contract.methods.buyTokens().send({
             from: userAccount,
             value: web3.utils.toWei(ethAmount, "ether"),
         });
 
+        // Log the successful token purchase
+        console.log('Tokens purchased:', reachAmount, 'Transaction:', transaction);
         alert(`You purchased ${reachAmount.toFixed(2)} Reach 9D-RC at $${reachPriceUSD} per token!`);
     } catch (error) {
         console.error("Transaction failed:", error);
@@ -131,6 +146,7 @@ async function buyTokens() {
 async function updateETHPrice() {
     ethPrice = await fetchETHPrice();
     document.getElementById('exchangeRateDisplay').innerText = `1 ETH = $${ethPrice}`;
+    console.log('Updated ETH price:', ethPrice);
 }
 
 updateETHPrice();
@@ -152,6 +168,9 @@ async function checkWalletConnection() {
             document.getElementById("walletAddress").value = userAccount;
             connectWalletBtn.innerText = "Disconnect Wallet";
             connectWalletBtn.onclick = disconnectWallet;
+
+            // Log the wallet connection status
+            console.log('Wallet already connected:', userAccount);
         }
     }
 }
