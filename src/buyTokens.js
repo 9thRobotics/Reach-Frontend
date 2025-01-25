@@ -93,17 +93,35 @@ document.getElementById('reachAmount').addEventListener('input', function() {
 });
 
 // Handle form submission for buying tokens
-document.getElementById('buyTokensForm').addEventListener('submit', async function (e) {
+document.getElementById("buyTokensForm").addEventListener("submit", async function (e) {
     e.preventDefault();
-    const walletAddress = userAccount;
-    const ethAmount = document.getElementById('ethAmount').value;
-    const reachAmount = (ethAmount * await fetchETHPrice()) / reachPriceUSD;
+    const walletAddress = document.getElementById("walletAddress").value;
+    const reachAmount = parseFloat(document.getElementById("reachAmount").value);
+    const ethRequired = parseFloat(document.getElementById("ethAmountDisplay").innerText.replace("ETH Required: ", ""));
+    const gasLimit = parseInt(document.getElementById("gasFeeInput").value) || 300000;  // User-defined gas limit
+    const slippageTolerance = parseFloat(document.getElementById("slippageInput").value) || 2;  // Default 2%
+
+    if (!walletAddress || reachAmount <= 0) {
+        alert("Invalid input. Please check wallet address and token amount.");
+        return;
+    }
 
     try {
-        await contract.methods.transfer('0xRecipientAddress', reachAmount).send({ from: walletAddress });
-        document.getElementById('message').innerText = `Success! You purchased ${reachAmount.toFixed(2)} Reach 9D-RC.`;
+        const contract = new web3.eth.Contract(ContractABI, contractAddress);
+        
+        // Adjust for slippage
+        const minTokens = reachAmount * ((100 - slippageTolerance) / 100); 
+
+        const transaction = await contract.methods.buyTokens(minTokens).send({
+            from: walletAddress,
+            value: web3.utils.toWei(ethRequired.toString(), "ether"),
+            gas: gasLimit // User-defined Gas Fee
+        });
+
+        alert(`✅ Success! Transaction Hash: ${transaction.transactionHash}`);
     } catch (error) {
-        document.getElementById('message').innerText = 'Failed to process the transaction. Please try again.';
+        console.error("❌ Transaction failed:", error);
+        alert(`❌ Transaction failed: ${error.message}`);
     }
 });
 
