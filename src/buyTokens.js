@@ -135,7 +135,7 @@ let ethPrice = 3000;  // Default ETH price (live fetch will update)
 const reachPriceUSD = 27;  // Fixed price of 1 Reach Token in USD
 
 // Contract address
-const contractAddress = '0x379d30d72a103b58cF00A6F5f8DBfe03C7bbf5Ef';  // Corrected address
+const contractAddress = '0x379d30D72A103B58Cf00A6F5f8DBfe03C7bbf5Ef';  // Corrected address
 
 // Log the contract address and validate it
 console.log("Contract Address:", contractAddress);
@@ -159,7 +159,7 @@ async function connectWallet() {
             document.getElementById("walletAddress").value = userAccount;
 
             // ✅ Initialize Contract After Wallet Connection
-            contract = new web3.eth.Contract(contractABI, contractAddress);
+            contract = new web3.eth.Contract(contractABI, checksummedAddress);
 
             // Log the successful connection and contract initialization
             console.log('Wallet connected:', userAccount);
