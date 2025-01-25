@@ -12,7 +12,7 @@ let ethPrice = 3000;  // Default ETH price (live fetch will update)
 const reachPriceUSD = 27;  // Fixed price of 1 Reach Token in USD
 
 // Contract address
-const contractAddress = '0x379d30d72a103b58cF00A6F5f8DBfe03C7bbf5Ef';  // Corrected address
+const contractAddress = '0x379D30D72A103B58Cf00a6F5f8DBFE03C7BBf5Ef';  // Corrected address
 
 // Create contract instance
 let contract;
