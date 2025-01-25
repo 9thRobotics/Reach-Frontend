@@ -15,32 +15,8 @@ const reachPriceUSD = 27;  // Fixed price of 1 Reach Token in USD
 const contractAddress = '0x379d30d72a103b58cF00A6F5f8DBfe03C7bbf5Ef';  // Corrected address
 
 // Create contract instance
-const contract = new web3.eth.Contract(ContractABI, contractAddress);
+let contract;
 
-// Open & Close Modal
-var modal = document.getElementById("buyTokensModal");
-var btn = document.getElementById("buyTokensBtn");
-var span = document.getElementsByClassName("close")[0];
-
-btn.onclick = function() {
-    if (!userAccount) {
-        alert("Please connect your wallet first.");
-        return;
-    }
-    modal.style.display = "block";
-}
-
-span.onclick = function() {
-    modal.style.display = "none";
-}
-
-window.onclick = function(event) {
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-}
-
-// Connect Wallet
 async function connectWallet() {
     if (window.ethereum) {
         web3 = new Web3(window.ethereum);
@@ -48,8 +24,9 @@ async function connectWallet() {
             const accounts = await ethereum.request({ method: "eth_requestAccounts" });
             userAccount = accounts[0];
             document.getElementById("walletAddress").value = userAccount;
-            connectWalletBtn.innerText = "Disconnect Wallet";
-            connectWalletBtn.onclick = disconnectWallet;
+
+            // ✅ Initialize Contract After Wallet Connection
+            contract = new web3.eth.Contract(ContractABI, contractAddress);
         } catch (error) {
             console.error("Wallet connection failed:", error);
         }
