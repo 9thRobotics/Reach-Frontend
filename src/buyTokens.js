@@ -1,6 +1,29 @@
 import Web3 from 'web3';
 
-// Contract ABI
+// Initialize Web3 globally
+let web3;
+if (window.ethereum) {
+    web3 = new Web3(window.ethereum);
+    console.log("✅ Web3 initialized.");
+} else {
+    console.error("❌ No Ethereum provider found. Please install MetaMask.");
+}
+
+// Contract address (ensure it's valid)
+const contractAddress = '0x379d30D72A103B58Cf00A6F5f8DBfe03C7bbf5Ef';
+
+// Validate the contract address
+if (!web3.utils.isAddress(contractAddress)) {
+    console.error("❌ Invalid contract address:", contractAddress);
+} else {
+    console.log("✅ Valid contract address:", contractAddress);
+}
+
+// Convert to checksum format **AFTER Web3 is initialized**
+const checksummedAddress = web3.utils.toChecksumAddress(contractAddress);
+console.log("Checksummed Address:", checksummedAddress);
+
+// Contract ABI (Ensure this is correct)
 const contractABI = [
     {
         "inputs": [],
@@ -128,47 +151,28 @@ const contractABI = [
     }
 ];
 
-// Initialize Web3
-let web3;
-let userAccount = null;
-let ethPrice = 3000;  // Default ETH price (live fetch will update)
-const reachPriceUSD = 27;  // Fixed price of 1 Reach Token in USD
-
-// Contract address
-const contractAddress = '0x379d30D72A103B58Cf00A6F5f8DBfe03C7bbf5Ef';  // Corrected address
-
-// Log the contract address and validate it
-console.log("Contract Address:", contractAddress);
-if (!contractAddress || contractAddress.length !== 42) {
-    console.error("❌ Invalid contract address:", contractAddress);
-}
-
-// Checksum Address
-const checksummedAddress = web3.utils.toChecksumAddress(contractAddress);
-console.log("Checksummed Address:", checksummedAddress);
-
-// Create contract instance
+// Create contract instance (will be initialized after wallet connection)
 let contract;
 
 async function connectWallet() {
-    if (window.ethereum) {
+    if (typeof window.ethereum !== "undefined") {
         web3 = new Web3(window.ethereum);
         try {
-            const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+            const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
             userAccount = accounts[0];
             document.getElementById("walletAddress").value = userAccount;
 
-            // ✅ Initialize Contract After Wallet Connection
+            // Initialize contract after wallet connection
             contract = new web3.eth.Contract(contractABI, checksummedAddress);
 
             // Log the successful connection and contract initialization
-            console.log('Wallet connected:', userAccount);
-            console.log('Contract initialized:', contract);
+            console.log("✅ Wallet connected:", userAccount);
+            console.log("✅ Contract initialized:", contract);
         } catch (error) {
-            console.error("Wallet connection failed:", error);
+            console.error("❌ Wallet connection failed:", error);
         }
     } else {
-        alert("MetaMask is not installed.");
+        alert("MetaMask is not installed. Please install MetaMask to connect.");
     }
 }
 
@@ -329,9 +333,11 @@ async function checkWalletConnection() {
 // ResizeObserver to detect resize events
 const resizeObserver = new ResizeObserver(entries => {
     requestAnimationFrame(() => {
-        for (let entry of entries) {
-            console.log("Resize detected:", entry);
-        }
+        setTimeout(() => {
+            for (let entry of entries) {
+                console.log("Resize detected:", entry);
+            }
+        }, 100);
     });
 });
 resizeObserver.observe(document.body);
