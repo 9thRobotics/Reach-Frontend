@@ -94,9 +94,12 @@ document.getElementById("buyTokensForm").addEventListener("submit", async functi
         return;
     }
 
+    if (!web3 || !contract) {
+        alert("Web3 or contract instance not initialized.");
+        return;
+    }
+
     try {
-        const contract = new web3.eth.Contract(ContractABI, contractAddress);
-        
         // Adjust for slippage
         const minTokens = reachAmount * ((100 - slippageTolerance) / 100); 
 
