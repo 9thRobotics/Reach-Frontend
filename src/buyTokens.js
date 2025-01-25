@@ -14,6 +14,16 @@ const reachPriceUSD = 27;  // Fixed price of 1 Reach Token in USD
 // Contract address
 const contractAddress = '0x379D30D72A103B58Cf00a6F5f8DBFE03C7BBf5Ef';  // Corrected address
 
+// Log the contract address and validate it
+console.log("Contract Address:", contractAddress);
+if (!contractAddress || contractAddress.length !== 42) {
+    console.error("❌ Invalid contract address:", contractAddress);
+}
+
+// Checksum Address
+const checksummedAddress = web3.utils.toChecksumAddress(contractAddress);
+console.log("Checksummed Address:", checksummedAddress);
+
 // Create contract instance
 let contract;
 
@@ -120,28 +130,43 @@ document.getElementById("buyTokensForm").addEventListener("submit", async functi
 
 // Add buyTokens function
 async function buyTokens() {
+    if (!userAccount) {
+        alert("Please connect your wallet first.");
+        return;
+    }
+
+    let reachAmount = prompt("Enter the number of Reach Tokens you want to buy:");
+
+    if (!reachAmount || isNaN(reachAmount) || reachAmount <= 0) {
+        alert("Invalid amount.");
+        return;
+    }
+
     try {
-        const ethAmount = document.getElementById("ethAmount").value;
-        const ethPriceUSD = await fetchETHPrice();
+        const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd");
+        const data = await response.json();
+        const ethPrice = data.ethereum.usd;  // Get ETH price in USD
 
-        if (!ethAmount || ethAmount <= 0) {
-            throw new Error("Please enter a valid ETH amount.");
-        }
+        const reachPriceUSD = 27;  // Fixed price for 1 Reach Token
+        const ethCost = (reachAmount * reachPriceUSD) / ethPrice;  // Convert to ETH
 
-        const reachAmount = (ethAmount * ethPriceUSD) / reachPriceUSD;
+        const confirmPurchase = confirm(`You are buying ${reachAmount} REACH for ${ethCost.toFixed(6)} ETH. Confirm?`);
+        if (!confirmPurchase) return;
 
-        const contract = new web3.eth.Contract(ContractABI, contractAddress);
-        const transaction = await contract.methods.buyTokens().send({
-            from: userAccount,
-            value: web3.utils.toWei(ethAmount, "ether"),
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+        const tx = await contract.buyTokens({
+            value: ethers.utils.parseEther(ethCost.toString())  // Send the correct ETH amount
         });
 
-        // Log the successful token purchase
-        console.log('Tokens purchased:', reachAmount, 'Transaction:', transaction);
-        alert(`You purchased ${reachAmount.toFixed(2)} Reach 9D-RC at $${reachPriceUSD} per token!`);
+        alert("Transaction sent! Waiting for confirmation...");
+        await tx.wait();
+        alert(`Purchase successful! You received ${reachAmount} REACH.`);
     } catch (error) {
         console.error("Transaction failed:", error);
-        alert("Transaction failed. Please try again.");
+        alert(`Transaction failed. Reason: ${error.message}`);
     }
 }
 
@@ -177,3 +202,13 @@ async function checkWalletConnection() {
         }
     }
 }
+
+// ResizeObserver to detect resize events
+const resizeObserver = new ResizeObserver(entries => {
+    requestAnimationFrame(() => {
+        for (let entry of entries) {
+            console.log("Resize detected:", entry);
+        }
+    });
+});
+resizeObserver.observe(document.body);
