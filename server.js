@@ -2,7 +2,14 @@ const path = require('path');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose'); // Added mongoose import
+
 const Transactions = require('./models/Transactions'); // Ensure you have this model file
+
+mongoose.connect('mongodb://localhost:27017/your_database_name', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}); // Added mongoose connection
 
 app.use(bodyParser.json()); // Middleware to parse JSON bodies
 
