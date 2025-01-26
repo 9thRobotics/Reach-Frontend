@@ -9,146 +9,19 @@ if (window.ethereum) {
     console.error("❌ No Ethereum provider found. Please install MetaMask.");
 }
 
-// Contract address (ensure it's valid)
-const contractAddress = '0x379d30D72A103B58Cf00A6F5f8DBfe03C7bbf5Ef';
+// Get contract address from environment variable
+let contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 
-// Validate the contract address
-if (!web3.utils.isAddress(contractAddress)) {
+if (!contractAddress || !web3.utils.isAddress(contractAddress)) {
     console.error("❌ Invalid contract address:", contractAddress);
 } else {
-    console.log("✅ Valid contract address:", contractAddress);
+    contractAddress = web3.utils.toChecksumAddress(contractAddress);
+    console.log("✅ Checksummed Contract Address:", contractAddress);
 }
-
-// Convert to checksum format **AFTER Web3 is initialized**
-const checksummedAddress = web3.utils.toChecksumAddress(contractAddress);
-console.log("Checksummed Address:", checksummedAddress);
 
 // Contract ABI (Ensure this is correct)
 const contractABI = [
-    {
-        "inputs": [],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            { "indexed": true, "internalType": "address", "name": "owner", "type": "address" },
-            { "indexed": true, "internalType": "address", "name": "spender", "type": "address" },
-            { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" }
-        ],
-        "name": "Approval",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            { "indexed": true, "internalType": "address", "name": "from", "type": "address" },
-            { "indexed": true, "internalType": "address", "name": "to", "type": "address" },
-            { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" }
-        ],
-        "name": "Transfer",
-        "type": "event"
-    },
-    {
-        "inputs": [
-            { "internalType": "address", "name": "", "type": "address" },
-            { "internalType": "address", "name": "", "type": "address" }
-        ],
-        "name": "allowance",
-        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            { "internalType": "address", "name": "spender", "type": "address" },
-            { "internalType": "uint256", "name": "value", "type": "uint256" }
-        ],
-        "name": "approve",
-        "outputs": [{ "internalType": "bool", "name": "success", "type": "bool" }],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-        ],
-        "name": "balanceOf",
-        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }],
-        "name": "burn",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "decimals",
-        "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }],
-        "name": "mint",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "name",
-        "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "owner",
-        "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "symbol",
-        "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "totalSupply",
-        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            { "internalType": "address", "name": "to", "type": "address" },
-            { "internalType": "uint256", "name": "value", "type": "uint256" }
-        ],
-        "name": "transfer",
-        "outputs": [{ "internalType": "bool", "name": "success", "type": "bool" }],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            { "internalType": "address", "name": "from", "type": "address" },
-            { "internalType": "address", "name": "to", "type": "address" },
-            { "internalType": "uint256", "name": "value", "type": "uint256" }
-        ],
-        "name": "transferFrom",
-        "outputs": [{ "internalType": "bool", "name": "success", "type": "bool" }],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    }
+    // ABI details here
 ];
 
 // Create contract instance (will be initialized after wallet connection)
@@ -163,9 +36,8 @@ async function connectWallet() {
             document.getElementById("walletAddress").value = userAccount;
 
             // Initialize contract after wallet connection
-            contract = new web3.eth.Contract(contractABI, checksummedAddress);
+            contract = new web3.eth.Contract(contractABI, contractAddress);
 
-            // Log the successful connection and contract initialization
             console.log("✅ Wallet connected:", userAccount);
             console.log("✅ Contract initialized:", contract);
         } catch (error) {
@@ -183,7 +55,6 @@ async function disconnectWallet() {
     connectWalletBtn.innerText = "Connect Your MetaMask Wallet";
     connectWalletBtn.onclick = connectWallet;
 
-    // Log the wallet disconnection
     console.log('Wallet disconnected');
 }
 
@@ -246,7 +117,6 @@ document.getElementById("buyTokensForm").addEventListener("submit", async functi
             gas: gasLimit // User-defined Gas Fee
         });
 
-        // Log the successful transaction
         console.log('Transaction successful:', transaction);
         alert(`✅ Success! Transaction Hash: ${transaction.transactionHash}`);
     } catch (error) {
@@ -324,7 +194,6 @@ async function checkWalletConnection() {
             connectWalletBtn.innerText = "Disconnect Wallet";
             connectWalletBtn.onclick = disconnectWallet;
 
-            // Log the wallet connection status
             console.log('Wallet already connected:', userAccount);
         }
     }
