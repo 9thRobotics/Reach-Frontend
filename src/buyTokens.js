@@ -1,4 +1,5 @@
 import Web3 from 'web3';
+import { ethers } from 'ethers';
 
 // Initialize Web3 globally
 let web3;
@@ -12,6 +13,7 @@ if (window.ethereum) {
 // Get contract address from environment variable
 let contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
 
+// Validate and checksum the contract address
 if (!contractAddress || !web3.utils.isAddress(contractAddress)) {
     console.error("❌ Invalid contract address:", contractAddress);
 } else {
@@ -21,7 +23,31 @@ if (!contractAddress || !web3.utils.isAddress(contractAddress)) {
 
 // Contract ABI (Ensure this is correct)
 const contractABI = [
-    // ABI details here
+    {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "address", "name": "owner", "type": "address" },
+            { "indexed": true, "internalType": "address", "name": "spender", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" }
+        ],
+        "name": "Approval",
+        "type": "event"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "spender", "type": "address" },
+            { "internalType": "uint256", "name": "value", "type": "uint256" }
+        ],
+        "name": "approve",
+        "outputs": [{ "internalType": "bool", "name": "success", "type": "bool" }],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
 ];
 
 // Create contract instance (will be initialized after wallet connection)
