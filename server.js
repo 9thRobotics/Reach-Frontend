@@ -1,5 +1,7 @@
 const path = require('path');
 const express = require('express');
+const cors = require('cors'); // Added cors import
+
 const app = express();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose'); // Added mongoose import
@@ -11,6 +13,7 @@ mongoose.connect('mongodb://localhost:27017/your_database_name', {
     useUnifiedTopology: true
 }); // Added mongoose connection
 
+app.use(cors()); // Enable CORS for all requests
 app.use(bodyParser.json()); // Middleware to parse JSON bodies
 
 // Serve static files from "public" directory
