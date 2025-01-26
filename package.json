@@ -10,10 +10,11 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },
-  "dependencies": {
+ "dependencies": {
   "react": "^18.3.1",
   "react-dom": "^18.3.1",
   "ethers": "^5.7.2"
+}
   },
   "devDependencies": {
     "vite": "^3.0.0",
