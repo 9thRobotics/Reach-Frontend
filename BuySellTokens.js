@@ -134,7 +134,7 @@
         let userAccount = null;
         let exchangeRate = 0;
         let gasFee = 0;
-        const contractAddress = "0x379d30d72a103b58cF00A6F5f8DBfe03C7bbf5Ef";
+        const contractAddress = "0xebeE54C6192a7B578b230Dd773d0d84Dc0cc3B13";
         const contractABI = [ /* Your contract ABI here */ ];
 
         // Modal elements
