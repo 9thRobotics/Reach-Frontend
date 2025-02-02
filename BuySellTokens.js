@@ -134,6 +134,8 @@
         let userAccount = null;
         let exchangeRate = 0;
         let gasFee = 0;
+        const contractAddress = "0x379d30d72a103b58cF00A6F5f8DBfe03C7bbf5Ef";
+        const contractABI = [ /* Your contract ABI here */ ];
 
         // Modal elements
         var modal = document.getElementById("sellTokensModal");
