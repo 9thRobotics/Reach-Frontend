@@ -1,4 +1,6 @@
-const API_BASE_URL = 'http://localhost:3000';
-const NETWORK_ID = 1; // ✅ Mainnet
+export const NETWORK_ID = 1;
 
-export { API_BASE_URL, NETWORK_ID };
+export const SELLER_ADDRESS = "0x0557aFA4318989702376D50B45547F953b7F9B21";
+
+export const CHAINLINK_FEED = "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"; // ETH/USD Mainnet
+
