@@ -1,3 +1,4 @@
-const API_BASE_URL = 'http://localhost:3000'; // For local development
+const API_BASE_URL = 'http://localhost:3000';
+const NETWORK_ID = 1; // ✅ Mainnet
 
-export default API_BASE_URL;
+export { API_BASE_URL, NETWORK_ID };
