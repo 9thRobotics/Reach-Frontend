@@ -1,135 +1,148 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buy Reach 9D-RC Tokens</title>
-    <style>
-        /* The Modal (background) */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            padding-top: 100px;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.7);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buy Reach 9D-RC Tokens</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0a0a0a;
+      color: #ffffff;
+      text-align: center;
+      padding: 40px;
+    }
 
-        /* Modal Content/Box */
-        .modal-content {
-            background-color: #1a1a2e;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 500px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            color: #ffffff;
-            text-align: center;
-        }
+    #exchangeRateDisplay, #calculatedAmountDisplay, #gasFeeDisplay {
+      margin: 20px 0;
+      font-size: 18px;
+      color: #4caf50;
+    }
 
-        /* The Close Button */
-        .close {
-            color: #ffffff;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+    #connectWalletBtn, #sellTokensBtn {
+      background-color: #46abab;
+      color: white;
+      padding: 12px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 10px;
+    }
 
-        .close:hover {
-            color: #46abab;
-            text-decoration: none;
-        }
+    #connectWalletBtn:hover, #sellTokensBtn:hover {
+      background-color: #3d9399;
+    }
 
-        /* Form Styles */
-        .modal-content input, .modal-content button {
-            margin: 10px 0;
-            padding: 12px;
-            width: 100%;
-            border: 2px solid #46abab;
-            border-radius: 8px;
-            background-color: #2a2d49;
-            color: white;
-            font-size: 16px;
-        }
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      padding-top: 100px;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.8);
+    }
 
-        /* Buttons */
-        .modal-content button {
-            background-color: #46abab;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
+    .modal-content {
+      background-color: #1a1a2e;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 480px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      color: #fff;
+    }
 
-        .modal-content button:hover {
-            background-color: #3d9399;
-        }
+    .modal-content input, .modal-content button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: 2px solid #46abab;
+      background-color: #2a2d49;
+      border-radius: 8px;
+      font-size: 16px;
+      color: white;
+    }
 
-        .message {
-            margin-top: 20px;
-            color: red;
-            font-weight: bold;
-        }
+    .modal-content button {
+      background-color: #46abab;
+      border: none;
+      cursor: pointer;
+    }
 
-        /* Main Buttons */
-        #sellTokensBtn, #connectWalletBtn {
-            background-color: #46abab;
-            color: white;
-            padding: 12px 24px;
-            font-size: 18px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s ease;
-        }
+    .modal-content button:hover {
+      background-color: #3d9399;
+    }
 
-        #sellTokensBtn:hover, #connectWalletBtn:hover {
-            background-color: #3d9399;
-        }
-    </style>
+    .close {
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #fff;
+    }
+
+    .close:hover {
+      color: #46abab;
+    }
+
+    .message {
+      margin-top: 20px;
+      color: red;
+      font-weight: bold;
+    }
+
+    span#reachTokenAmount {
+      display: block;
+      margin: 10px 0;
+      font-size: 20px;
+      color: #4caf50;
+    }
+  </style>
 </head>
 <body>
-    <!-- Display the live exchange rate -->
-    <div id="exchangeRateDisplay">Exchange Rate: Loading...</div>
-    <div id="calculatedAmountDisplay">Reach 9D-RC: 0</div>
-    <div id="gasFeeDisplay">Estimated Gas Fees: Loading...</div>
+  <h1>Buy Reach 9D‑RC Token</h1>
 
-    <!-- Connect Wallet Button -->
-    <button id="connectWalletBtn">Connect Your MetaMask Wallet</button>
+  <div id="exchangeRateDisplay">Exchange Rate: Loading...</div>
+  <div id="calculatedAmountDisplay">Reach 9D-RC: 0</div>
+  <div id="gasFeeDisplay">Estimated Gas: Pending...</div>
 
-    <!-- Fixed Price Information -->
-    <p>Fixed Price: $27 per Reach 9D-RC</p>
-    <p>Enter ETH amount to see how much Reach 9D-RC you will receive:</p>
+  <button id="connectWalletBtn">Connect Wallet</button>
 
-    <!-- Trigger/Open The Modal -->
-    <button id="sellTokensBtn">Buy Tokens</button>
+  <p>Fixed Price: $27 per Reach 9D‑RC Token</p>
+  <p>Enter ETH amount to see how much you'll receive:</p>
 
-    <!-- The Modal -->
-    <div id="sellTokensModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Buy Reach Tokens</h2>
-            <form id="sellTokensForm">
-                <input type="text" id="walletAddress" placeholder="Your Wallet Address" required readonly>
-                <label>Amount of ETH:</label>
-                <input type="number" id="ethAmount" oninput="updateReachAmount(this.value)" required>
-                <label>You will receive:</label>
-                <span id="reachTokenAmount">0</span> Reach 9D-RC
-                <button type="submit">Buy Tokens</button>
-            </form>
-            <div id="message" class="message"></div>
-        </div>
+  <button id="sellTokensBtn">Buy Tokens</button>
+
+  <!-- Modal -->
+  <div id="sellTokensModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Buy Reach Tokens</h2>
+      <form id="sellTokensForm">
+        <input type="text" id="walletAddress" placeholder="Your Wallet Address" required readonly />
+        <label>Amount of ETH:</label>
+        <input type="number" id="ethAmount" oninput="updateReachAmount(this.value)" required />
+        <label>You will receive:</label>
+        <span id="reachTokenAmount">0</span> Reach 9D-RC
+        <input type="number" id="slippageInput" placeholder="Slippage %" value="2" />
+        <input type="number" id="gasFeeInput" placeholder="Gas Limit (optional)" />
+        <button type="submit">Confirm Purchase</button>
+      </form>
+      <div id="message" class="message"></div>
     </div>
+  </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.6.0/web3.min.js"></script>
-    <script src="src/buyTokens.js"></script> <!-- Include buyTokens.js script -->
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.6.0/web3.min.js"></script>
+  <script type="module" src="src/buyTokens.js"></script>
 </body>
 </html>
