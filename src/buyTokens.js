@@ -1,102 +1,69 @@
-import Web3 from 'web3';
-import { NETWORK_ID, SELLER_ADDRESS } from './config.js';
-
-let web3;
-let userAccount = null;
-
-// DOM elements
-const connectWalletBtn = document.getElementById('connectWalletBtn');
-const sellTokensBtn = document.getElementById('sellTokensBtn');
-const sellTokensModal = document.getElementById('sellTokensModal');
-const closeModal = document.querySelector('.close');
-const walletAddressInput = document.getElementById('walletAddress');
-const reachTokenAmountSpan = document.getElementById('reachTokenAmount');
-const calculatedAmountDisplay = document.getElementById('calculatedAmountDisplay');
-const gasFeeDisplay = document.getElementById('gasFeeDisplay');
-const sellTokensForm = document.getElementById('sellTokensForm');
-const messageBox = document.getElementById('message');
-
-// Constants
-const TOKEN_FLOOR_USD = 27; // $27 fixed price
-const MOCK_ETH_USD = 3200;
-
-// Connect wallet
-connectWalletBtn.onclick = async () => {
-  if (window.ethereum) {
-    web3 = new Web3(window.ethereum);
-    try {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      userAccount = accounts[0];
-      walletAddressInput.value = userAccount;
-      connectWalletBtn.innerText = `Connected`;
-      connectWalletBtn.disabled = true;
-
-      const networkId = await web3.eth.getChainId();
-      if (networkId !== NETWORK_ID) {
-        alert(`Wrong network (Chain ${networkId}) – switch to Ethereum Mainnet`);
-        return;
-      }
-
-      updateReachEstimate();
-    } catch (err) {
-      console.error(err);
-      messageBox.innerText = 'Wallet connection failed.';
-    }
-  } else {
-    alert('MetaMask not found.');
-  }
-};
-
-// Show modal
-sellTokensBtn.onclick = () => {
-  if (!userAccount) return alert('Please connect your wallet first.');
-  sellTokensModal.style.display = 'block';
-};
-
-// Close modal
-closeModal.onclick = () => {
-  sellTokensModal.style.display = 'none';
-};
-
-// Estimate ETH based on Reach token amount
-function updateReachEstimate() {
-  const input = document.getElementById('ethAmount').value;
-  const ethAmount = parseFloat(input);
-  if (isNaN(ethAmount) || ethAmount <= 0) {
-    reachTokenAmountSpan.innerText = '0';
-    calculatedAmountDisplay.innerText = `Reach 9D‑RC: 0`;
-    return;
-  }
-
-  const reachTokens = (ethAmount * MOCK_ETH_USD) / TOKEN_FLOOR_USD;
-  reachTokenAmountSpan.innerText = reachTokens.toFixed(4);
-  calculatedAmountDisplay.innerText = `Reach 9D‑RC: ${reachTokens.toFixed(4)}`;
-}
-
-// Trigger estimate live
-document.getElementById('ethAmount').addEventListener('input', updateReachEstimate);
-
-// Submit ETH to SELLER
-sellTokensForm.onsubmit = async (e) => {
-  e.preventDefault();
-  const ethAmount = document.getElementById('ethAmount').value;
-
-  if (!ethAmount || isNaN(ethAmount)) {
-    messageBox.innerText = 'Invalid ETH amount';
-    return;
-  }
-
+async function buyTokens() {
   try {
-    const tx = {
-      from: userAccount,
-      to: SELLER_ADDRESS,
-      value: web3.utils.toWei(ethAmount, 'ether'),
-    };
+    const tokenInput = parseFloat(document.getElementById("tokenAmount").value);
+    if (!tokenInput || tokenInput <= 0) {
+      alert("Enter a valid token amount.");
+      return;
+    }
 
-    await web3.eth.sendTransaction(tx);
-    messageBox.innerText = '✅ Success! Reach Tokens incoming.';
+    // 1. Get ETH/USD from Chainlink
+    const priceFeed = new ethers.Contract(
+      "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419", // ETH/USD mainnet feed
+      [
+        {
+          "inputs": [],
+          "name": "latestRoundData",
+          "outputs": [
+            { "name": "roundId", "type": "uint80" },
+            { "name": "answer", "type": "int256" },
+            { "name": "startedAt", "type": "uint256" },
+            { "name": "updatedAt", "type": "uint256" },
+            { "name": "answeredInRound", "type": "uint80" }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        }
+      ],
+      provider
+    );
+
+    const roundData = await priceFeed.latestRoundData();
+    const ethPrice = Number(roundData.answer) / 1e8;
+
+    // 2. Calculate ETH required
+    const usdPerToken = 27;
+    const totalUSD = usdPerToken * tokenInput;
+    const ethRequired = totalUSD / ethPrice;
+
+    const ethValue = ethers.utils.parseEther(ethRequired.toFixed(6));
+    const minTokens = ethers.utils.parseUnits(tokenInput.toString(), 18);
+
+    // 3. Call smart contract buyTokens
+    const seller = new ethers.Contract(
+      "0x0557aFA4318989702376D50B45547F953b7F9B21",
+      [
+        {
+          "inputs": [{ "internalType": "uint256", "name": "minTokens", "type": "uint256" }],
+          "name": "buyTokens",
+          "outputs": [],
+          "stateMutability": "payable",
+          "type": "function"
+        }
+      ],
+      signer
+    );
+
+    const tx = await seller.buyTokens(minTokens, {
+      value: ethValue,
+      gasLimit: 180000
+    });
+
+    document.getElementById("txStatus").textContent = "⏳ Waiting for confirmation...";
+    await tx.wait();
+    document.getElementById("txStatus").textContent = "✅ Purchase successful!";
   } catch (err) {
     console.error(err);
-    messageBox.innerText = `❌ Failed: ${err.message}`;
+    document.getElementById("txStatus").textContent =
+      `❌ Failed: ${err.reason || err.message || "Unknown error"}`;
   }
-};
+}
