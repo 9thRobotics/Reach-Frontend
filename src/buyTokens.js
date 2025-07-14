@@ -71,9 +71,28 @@ function getETHUSDPrice() {
   return 3200; // hardcoded for now (mock)
 }
 
-async function updateExchangeRateDisplay() {
-  exchangeRateDisplay.innerText = `Exchange Rate: $${getETHUSDPrice()} / ETH`;
-  gasFeeDisplay.innerText = `Estimated Gas: 150,000`;
+async function buyTokens() {
+  try {
+    const tokenInput = parseFloat(document.getElementById("tokenAmount").value);
+    if (!tokenInput || tokenInput <= 0) return alert("Enter token quantity.");
+
+    const minTokens = ethers.utils.parseUnits(Math.floor(tokenInput).toString(), TOKEN_DECIMALS);
+    const ethRequired = ethers.utils.parseEther(
+      ((tokenInput * TOKEN_FLOOR_USD) / ethPriceUsd).toString()
+    );
+
+    const tx = await sellerContract.buyTokens(minTokens, { value: ethRequired });
+    document.getElementById("txStatus").textContent = "Waiting for confirmation…";
+    await tx.wait();
+    document.getElementById("txStatus").textContent = "✅ Purchase confirmed!";
+    document.getElementById("tokenAmount").value = "";
+    updateEstimate();
+    refreshBalance();
+  } catch (err) {
+    console.error(err);
+    document.getElementById("txStatus").textContent =
+      `❌ Failed: ${err.reason || err.message || err}`;
+  }
 }
 
 // Buy tokens
