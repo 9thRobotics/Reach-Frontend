@@ -1,0 +1,44 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build artifacts
+build/
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+
+# Logs
+*.log
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Ignore system files
+AppData/
+*.jtx
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node.js dependencies
+node_modules/
+
+# Build files
+dist/
+build/
+
