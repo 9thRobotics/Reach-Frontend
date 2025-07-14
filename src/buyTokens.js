@@ -1,88 +1,103 @@
-import { ethers } from "ethers";
-import { SELLER_ADDRESS, NETWORK_ID } from "./config";
+import Web3 from 'web3';
+import { NETWORK_ID, SELLER_ADDRESS, CHAINLINK_FEED } from './config.js';
 
-let provider;
-let signer;
-let contract;
-let userAddress;
+let web3;
+let userAccount = null;
 
-const contractABI = [
-  {
-    "inputs": [{ "internalType": "uint256", "name": "minTokens", "type": "uint256" }],
-    "name": "buyTokens",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  }
-];
+const connectWalletBtn = document.getElementById('connectWalletBtn');
+const sellTokensBtn = document.getElementById('sellTokensBtn');
+const sellTokensModal = document.getElementById('sellTokensModal');
+const closeModal = document.querySelector('.close');
+const walletAddressInput = document.getElementById('walletAddress');
+const reachTokenAmountSpan = document.getElementById('reachTokenAmount');
+const exchangeRateDisplay = document.getElementById('exchangeRateDisplay');
+const calculatedAmountDisplay = document.getElementById('calculatedAmountDisplay');
+const gasFeeDisplay = document.getElementById('gasFeeDisplay');
+const sellTokensForm = document.getElementById('sellTokensForm');
+const messageBox = document.getElementById('message');
 
 // Connect Wallet
-export async function connectWallet() {
-  if (typeof window.ethereum === "undefined") {
-    alert("MetaMask not detected.");
-    return;
+connectWalletBtn.onclick = async () => {
+  if (window.ethereum) {
+    web3 = new Web3(window.ethereum);
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      userAccount = accounts[0];
+      walletAddressInput.value = userAccount;
+      connectWalletBtn.innerText = `Connected`;
+      connectWalletBtn.disabled = true;
+
+      const networkId = await web3.eth.getChainId();
+      if (networkId !== NETWORK_ID) {
+        alert('Wrong network (chain ' + networkId + '). Switch to Ethereum Mainnet and reload.');
+        return;
+      }
+
+      updateExchangeRateDisplay();
+    } catch (err) {
+      console.error(err);
+    }
+  } else {
+    alert('MetaMask not detected!');
   }
+};
 
-  provider = new ethers.providers.Web3Provider(window.ethereum);
-  const { chainId } = await provider.getNetwork();
+// Show modal
+sellTokensBtn.onclick = () => {
+  if (!userAccount) return alert('Please connect your wallet first.');
+  sellTokensModal.style.display = 'block';
+};
 
-  if (chainId !== NETWORK_ID) {
-    alert(`Wrong network (chain ${chainId}). Switch to Ethereum Mainnet and reload.`);
-    return;
+// Close modal
+closeModal.onclick = () => {
+  sellTokensModal.style.display = 'none';
+};
+
+// Update calculated Reach amount
+window.updateReachAmount = (ethAmount) => {
+  const fixedPrice = 27;
+  if (!isNaN(ethAmount) && ethAmount > 0) {
+    const reachAmount = (ethAmount * getETHUSDPrice()) / fixedPrice;
+    reachTokenAmountSpan.innerText = reachAmount.toFixed(4);
+    calculatedAmountDisplay.innerText = `Reach 9D-RC: ${reachAmount.toFixed(4)}`;
+  } else {
+    reachTokenAmountSpan.innerText = '0';
+    calculatedAmountDisplay.innerText = `Reach 9D-RC: 0`;
   }
+};
 
-  await provider.send("eth_requestAccounts", []);
-  signer = provider.getSigner();
-  userAddress = await signer.getAddress();
-
-  contract = new ethers.Contract(SELLER_ADDRESS, contractABI, signer);
-
-  document.getElementById("walletAddress").innerText = userAddress;
-  console.log("✅ Wallet connected:", userAddress);
+// Get price feed (mock for now)
+function getETHUSDPrice() {
+  return 3200; // hardcoded for now (mock)
 }
 
-// Buy Tokens
-export async function buyTokens() {
-  if (!contract || !signer || !userAddress) {
-    alert("Please connect your wallet first.");
-    return;
-  }
-
-  const reachInput = document.getElementById("reachAmount");
-  const slippageInput = document.getElementById("slippageInput");
-
-  const reachAmount = parseFloat(reachInput.value);
-  const slippage = parseFloat(slippageInput.value) || 2;
-
-  if (isNaN(reachAmount) || reachAmount <= 0) {
-    alert("Invalid Reach amount.");
-    return;
-  }
-
-  // Get ETH price in USD
-  let ethPriceUSD = 2700;
-  try {
-    const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd");
-    const data = await res.json();
-    ethPriceUSD = data.ethereum.usd;
-  } catch (err) {
-    console.warn("Could not fetch ETH price, using default.");
-  }
-
-  const reachPriceUSD = 27;
-  const ethCost = (reachAmount * reachPriceUSD) / ethPriceUSD;
-  const minTokens = ethers.utils.parseUnits((reachAmount * ((100 - slippage) / 100)).toString(), 18);
-
-  try {
-    const tx = await contract.buyTokens(minTokens, {
-      value: ethers.utils.parseEther(ethCost.toString())
-    });
-
-    alert("Transaction sent. Awaiting confirmation...");
-    await tx.wait();
-    alert("✅ Purchase successful!");
-  } catch (err) {
-    console.error("❌ Transaction failed:", err);
-    alert("Transaction failed. See console for details.");
-  }
+async function updateExchangeRateDisplay() {
+  exchangeRateDisplay.innerText = `Exchange Rate: $${getETHUSDPrice()} / ETH`;
+  gasFeeDisplay.innerText = `Estimated Gas: 150,000`;
 }
+
+// Buy tokens
+sellTokensForm.onsubmit = async (e) => {
+  e.preventDefault();
+  const ethAmount = document.getElementById('ethAmount').value;
+  const slippage = document.getElementById('slippageInput').value;
+
+  if (!ethAmount || isNaN(ethAmount)) {
+    messageBox.innerText = 'Invalid ETH amount';
+    return;
+  }
+
+  try {
+    const tx = {
+      from: userAccount,
+      to: SELLER_ADDRESS,
+      value: web3.utils.toWei(ethAmount, 'ether'),
+    };
+
+    await web3.eth.sendTransaction(tx);
+    messageBox.innerText = 'Success! Tokens will be delivered shortly.';
+  } catch (err) {
+    console.error(err);
+    messageBox.innerText = 'Transaction failed.';
+  }
+};
