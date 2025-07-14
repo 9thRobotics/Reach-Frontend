@@ -1,22 +1,26 @@
 import Web3 from 'web3';
-import { NETWORK_ID, SELLER_ADDRESS, CHAINLINK_FEED } from './config.js';
+import { NETWORK_ID, SELLER_ADDRESS } from './config.js';
 
 let web3;
 let userAccount = null;
 
+// DOM elements
 const connectWalletBtn = document.getElementById('connectWalletBtn');
 const sellTokensBtn = document.getElementById('sellTokensBtn');
 const sellTokensModal = document.getElementById('sellTokensModal');
 const closeModal = document.querySelector('.close');
 const walletAddressInput = document.getElementById('walletAddress');
 const reachTokenAmountSpan = document.getElementById('reachTokenAmount');
-const exchangeRateDisplay = document.getElementById('exchangeRateDisplay');
 const calculatedAmountDisplay = document.getElementById('calculatedAmountDisplay');
 const gasFeeDisplay = document.getElementById('gasFeeDisplay');
 const sellTokensForm = document.getElementById('sellTokensForm');
 const messageBox = document.getElementById('message');
 
-// Connect Wallet
+// Constants
+const TOKEN_FLOOR_USD = 27; // $27 fixed price
+const MOCK_ETH_USD = 3200;
+
+// Connect wallet
 connectWalletBtn.onclick = async () => {
   if (window.ethereum) {
     web3 = new Web3(window.ethereum);
@@ -29,16 +33,17 @@ connectWalletBtn.onclick = async () => {
 
       const networkId = await web3.eth.getChainId();
       if (networkId !== NETWORK_ID) {
-        alert('Wrong network (chain ' + networkId + '). Switch to Ethereum Mainnet and reload.');
+        alert(`Wrong network (Chain ${networkId}) – switch to Ethereum Mainnet`);
         return;
       }
 
-      updateExchangeRateDisplay();
+      updateReachEstimate();
     } catch (err) {
       console.error(err);
+      messageBox.innerText = 'Wallet connection failed.';
     }
   } else {
-    alert('MetaMask not detected!');
+    alert('MetaMask not found.');
   }
 };
 
@@ -53,111 +58,28 @@ closeModal.onclick = () => {
   sellTokensModal.style.display = 'none';
 };
 
-// Update calculated Reach amount
-window.updateReachAmount = (ethAmount) => {
-  const fixedPrice = 27;
-  if (!isNaN(ethAmount) && ethAmount > 0) {
-    const reachAmount = (ethAmount * getETHUSDPrice()) / fixedPrice;
-    reachTokenAmountSpan.innerText = reachAmount.toFixed(4);
-    calculatedAmountDisplay.innerText = `Reach 9D-RC: ${reachAmount.toFixed(4)}`;
-  } else {
+// Estimate ETH based on Reach token amount
+function updateReachEstimate() {
+  const input = document.getElementById('ethAmount').value;
+  const ethAmount = parseFloat(input);
+  if (isNaN(ethAmount) || ethAmount <= 0) {
     reachTokenAmountSpan.innerText = '0';
-    calculatedAmountDisplay.innerText = `Reach 9D-RC: 0`;
+    calculatedAmountDisplay.innerText = `Reach 9D‑RC: 0`;
+    return;
   }
-};
 
-// Get price feed (mock for now)
-function getETHUSDPrice() {
-  return 3200; // hardcoded for now (mock)
+  const reachTokens = (ethAmount * MOCK_ETH_USD) / TOKEN_FLOOR_USD;
+  reachTokenAmountSpan.innerText = reachTokens.toFixed(4);
+  calculatedAmountDisplay.innerText = `Reach 9D‑RC: ${reachTokens.toFixed(4)}`;
 }
 
-async function buyTokens() {
-  try {
-    const tokenInput = parseFloat(document.getElementById("tokenAmount").value);
-    if (!tokenInput || tokenInput <= 0) return alert("Enter a valid token amount.");
+// Trigger estimate live
+document.getElementById('ethAmount').addEventListener('input', updateReachEstimate);
 
-    const totalUSD = tokenInput * TOKEN_FLOOR_USD;
-    const ethNeeded = totalUSD / ethPriceUsd;
-
-    const ethWei = ethers.utils.parseUnits(ethNeeded.toFixed(6), "ether");
-    const minTokens = ethers.utils.parseUnits(tokenInput.toString(), TOKEN_DECIMALS);
-
-    // Send transaction
-    const tx = await signer.sendTransaction({
-      to: SELLER_ADDRESS,
-      value: ethWei,
-      data: sellerContract.interface.encodeFunctionData("buyTokens", [minTokens]),
-      gasLimit: 150000, // Add a fixed gas limit
-    });
-    
-    document.getElementById("txStatus").textContent = "Waiting for confirmation…";
-    await tx.wait();
-    document.getElementById("txStatus").textContent = "✅ Purchase confirmed!";
-    document.getElementById("tokenAmount").value = "";
-    updateEstimateFromTokenAmount();
-    refreshBalance();
-  } catch (err) {
-    console.error(err);
-    document.getElementById("txStatus").textContent = `❌ Failed: ${err.reason || err.message}`;
-  }
-}
-
-  const totalUSD = tokenInput * TOKEN_FLOOR_USD; // $27 per token
-  const ethNeeded = totalUSD / ethPriceUsd;
-
-  document.getElementById("estimate").textContent =
-    `≈ ${ethNeeded.toFixed(6)} ETH ($${totalUSD.toFixed(2)} USD)`;
-}
-
-async function buyTokens() {
-  try {
-    const tokenInput = parseFloat(document.getElementById("tokenAmount").value);
-    if (!tokenInput || tokenInput <= 0) {
-      alert("Enter a valid Reach token amount.");
-      return;
-    }
-
-    const totalUSD = tokenInput * TOKEN_FLOOR_USD;
-    const ethNeeded = totalUSD / ethPriceUsd;
-    const ethValue = ethers.utils.parseEther(ethNeeded.toFixed(6));
-
-    const minTokens = ethers.utils.parseUnits(Math.floor(tokenInput).toString(), TOKEN_DECIMALS);
-
-    const tx = await sellerContract.buyTokens(minTokens, { value: ethValue });
-    document.getElementById("txStatus").textContent = "⏳ Waiting for confirmation…";
-    await tx.wait();
-
-    document.getElementById("txStatus").textContent = "✅ Purchase successful!";
-    document.getElementById("tokenAmount").value = "";
-    updateEstimateFromTokenAmount();
-    refreshBalance();
-  } catch (err) {
-    console.error(err);
-    document.getElementById("txStatus").textContent =
-      `❌ Failed: ${err.reason || err.message || "Unknown error"}`;
-  }
-}
-
-
-    const tx = await sellerContract.buyTokens(minTokens, { value: ethRequired });
-    document.getElementById("txStatus").textContent = "Waiting for confirmation…";
-    await tx.wait();
-    document.getElementById("txStatus").textContent = "✅ Purchase confirmed!";
-    document.getElementById("tokenAmount").value = "";
-    updateEstimate();
-    refreshBalance();
-  } catch (err) {
-    console.error(err);
-    document.getElementById("txStatus").textContent =
-      `❌ Failed: ${err.reason || err.message || err}`;
-  }
-}
-
-// Buy tokens
+// Submit ETH to SELLER
 sellTokensForm.onsubmit = async (e) => {
   e.preventDefault();
   const ethAmount = document.getElementById('ethAmount').value;
-  const slippage = document.getElementById('slippageInput').value;
 
   if (!ethAmount || isNaN(ethAmount)) {
     messageBox.innerText = 'Invalid ETH amount';
@@ -172,9 +94,9 @@ sellTokensForm.onsubmit = async (e) => {
     };
 
     await web3.eth.sendTransaction(tx);
-    messageBox.innerText = 'Success! Tokens will be delivered shortly.';
+    messageBox.innerText = '✅ Success! Reach Tokens incoming.';
   } catch (err) {
     console.error(err);
-    messageBox.innerText = 'Transaction failed.';
+    messageBox.innerText = `❌ Failed: ${err.message}`;
   }
 };
