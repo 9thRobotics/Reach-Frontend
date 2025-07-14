@@ -71,13 +71,36 @@ function getETHUSDPrice() {
   return 3200; // hardcoded for now (mock)
 }
 
-async function updateEstimateFromTokenAmount() {
-  const tokenInput = parseFloat(document.getElementById("tokenAmount").value);
-  if (!ethPriceUsd || !tokenInput || tokenInput <= 0) {
-    document.getElementById("estimate").textContent =
-      tokenInput ? "Fetching price…" : "Enter token amount to see estimate";
-    return;
+async function buyTokens() {
+  try {
+    const tokenInput = parseFloat(document.getElementById("tokenAmount").value);
+    if (!tokenInput || tokenInput <= 0) return alert("Enter a valid token amount.");
+
+    const totalUSD = tokenInput * TOKEN_FLOOR_USD;
+    const ethNeeded = totalUSD / ethPriceUsd;
+
+    const ethWei = ethers.utils.parseUnits(ethNeeded.toFixed(6), "ether");
+    const minTokens = ethers.utils.parseUnits(tokenInput.toString(), TOKEN_DECIMALS);
+
+    // Send transaction
+    const tx = await signer.sendTransaction({
+      to: SELLER_ADDRESS,
+      value: ethWei,
+      data: sellerContract.interface.encodeFunctionData("buyTokens", [minTokens]),
+      gasLimit: 150000, // Add a fixed gas limit
+    });
+    
+    document.getElementById("txStatus").textContent = "Waiting for confirmation…";
+    await tx.wait();
+    document.getElementById("txStatus").textContent = "✅ Purchase confirmed!";
+    document.getElementById("tokenAmount").value = "";
+    updateEstimateFromTokenAmount();
+    refreshBalance();
+  } catch (err) {
+    console.error(err);
+    document.getElementById("txStatus").textContent = `❌ Failed: ${err.reason || err.message}`;
   }
+}
 
   const totalUSD = tokenInput * TOKEN_FLOOR_USD; // $27 per token
   const ethNeeded = totalUSD / ethPriceUsd;
