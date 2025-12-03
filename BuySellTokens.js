@@ -1,329 +1,193 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buy Reach 9D-RC Tokens</title>
-    <style>
-        /* The Modal (background) */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            padding-top: 100px;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.7);
-        }
-
-        /* Modal Content/Box */
-        .modal-content {
-            background-color: #1a1a2e;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 500px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            color: #ffffff;
-            text-align: center;
-        }
-
-        /* The Close Button */
-        .close {
-            color: #ffffff;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close:hover {
-            color: #46abab;
-            text-decoration: none;
-        }
-
-        /* Form Styles */
-        .modal-content input, .modal-content button {
-            margin: 10px 0;
-            padding: 12px;
-            width: 100%;
-            border: 2px solid #46abab;
-            border-radius: 8px;
-            background-color: #2a2d49;
-            color: white;
-            font-size: 16px;
-        }
-
-        /* Buttons */
-        .modal-content button {
-            background-color: #46abab;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .modal-content button:hover {
-            background-color: #3d9399;
-        }
-
-        .message {
-            margin-top: 20px;
-            color: red;
-            font-weight: bold;
-        }
-
-        /* Main Buttons */
-        #sellTokensBtn, #connectWalletBtn {
-            background-color: #46abab;
-            color: white;
-            padding: 12px 24px;
-            font-size: 18px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s ease;
-        }
-
-        #sellTokensBtn:hover, #connectWalletBtn:hover {
-            background-color: #3d9399;
-        }
-    </style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Buy Reach 9D-RC — Mainnet (Multi-Wallet)</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:24px;background:#071126;color:#e6eef6}
+    .card{background:#071a2a;padding:18px;border-radius:10px;max-width:760px;margin:18px auto;box-shadow:0 8px 30px rgba(0,0,0,.6)}
+    h1{margin:0 0 8px;font-size:20px}
+    label{display:block;margin-top:10px;font-size:13px;color:#9fb0c2}
+    input,button,select{padding:10px;border-radius:8px;border:1px solid #203843;background:#06111a;color:#e6eef6}
+    button{cursor:pointer}
+    .muted{color:#90aebf;font-size:13px}
+    #status{margin-top:12px;font-weight:600}
+    a.small{color:#7ee787;font-size:13px}
+    pre{white-space:pre-wrap;word-break:break-word}
+  </style>
 </head>
 <body>
-    <!-- Display the live exchange rate -->
-    <div id="exchangeRateDisplay">Exchange Rate: Loading...</div>
-    <div id="calculatedAmountDisplay">Reach 9D-RC: 0</div>
-    <div id="gasFeeDisplay">Estimated Gas Fees: Loading...</div>
+  <div class="card">
+    <h1>Buy Reach (9D-RC) — Ethereum Mainnet</h1>
+    <div class="muted">Token contract: <a class="small" id="tokenLink" href="https://etherscan.io/token/0x41A61CdCf40a074546423Bae987B81733F3FBAc5" target="_blank" rel="noreferrer">0x41A61CdC...BAc5 (Etherscan)</a></div>
+    <div class="muted">Chainlink ETH/USD feed (mainnet): <a class="small" href="https://etherscan.io/address/0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419" target="_blank" rel="noreferrer">0x5f4e...8419</a></div>
+    <div class="muted">Buyback wallet: <span id="buybackAddr">0x0557afA4318989702376D50B45547F953B7f9B21</span></div>
 
-    <!-- Connect Wallet Button -->
-    <button id="connectWalletBtn">Connect Your MetaMask Wallet</button>
-
-    <!-- New Buy Tokens Button -->
-    <button id="buyTokens" onclick="buyTokens()">Buy Reach ($27 per Token)</button>
-
-    <!-- Trigger/Open The Modal -->
-    <button id="sellTokensBtn">Buy Tokens</button>
-
-    <!-- The Modal -->
-    <div id="sellTokensModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Buy Reach Tokens</h2>
-            <form id="sellTokensForm">
-                <input type="text" id="walletAddress" placeholder="Your Wallet Address" required readonly>
-                <label>Amount of ETH:</label>
-                <input type="number" id="ethAmount" oninput="updateReachAmount(this.value)" required>
-                <label>You will receive:</label>
-                <span id="reachTokenAmount">0</span> Reach 9D-RC
-                <button type="submit">Buy Tokens</button>
-            </form>
-            <div id="message" class="message"></div>
-        </div>
+    <div style="margin-top:12px">
+      <button id="connectBtn">Connect Wallet (choose)</button>
+      <button id="disconnectBtn" style="display:none;margin-left:8px">Disconnect</button>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.6.0/web3.min.js"></script>
-    <script>
-        let web3;
-        let userAccount = null;
-        let exchangeRate = 0;
-        let gasFee = 0;
-        const contractAddress = "0xebeE54C6192a7B578b230Dd773d0d84Dc0cc3B13";
-        const contractABI = [ /* Your contract ABI here */ ];
+    <div style="margin-top:12px">
+      <label>Your address</label>
+      <input id="wallet" readonly placeholder="Not connected" style="width:100%"/>
+    </div>
 
-        // Modal elements
-        var modal = document.getElementById("sellTokensModal");
-        var btn = document.getElementById("sellTokensBtn");
-        var span = document.getElementsByClassName("close")[0];
+    <div style="margin-top:12px">
+      <label>Tokens to buy (whole tokens)</label>
+      <input id="tokenQty" type="number" min="1" step="1" value="1" style="width:100%"/>
+      <div class="muted" style="margin-top:6px">ETH required (calculated from on-chain price)</div>
+      <input id="ethNeeded" readonly style="width:100%;margin-top:6px"/>
+    </div>
 
-        // Open modal
-        btn.onclick = function() {
-            if (!userAccount) {
-                alert("Please connect your wallet first.");
-                return;
-            }
-            modal.style.display = "block";
+    <div style="margin-top:12px">
+      <button id="calcBtn">Calculate ETH Needed</button>
+      <button id="buyBtn" style="margin-left:8px">Buy Tokens</button>
+    </div>
+
+    <div id="status"></div>
+    <div id="txInfo" style="margin-top:10px"></div>
+  </div>
+
+  <!-- libs: ethers + web3modal + walletconnect v1 -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/web3modal/1.9.12/index.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/walletconnect/1.8.0/web3-provider.min.js"></script>
+
+  <script>
+  (async function(){
+    // ---------- LIVE CONFIG (no blanks) ----------
+    const TOKEN_CONTRACT = "0x41A61CdCf40a074546423Bae987B81733F3FBAc5"; // Your token (Mainnet)
+    const BUYBACK_WALLET = "0x0557afA4318989702376D50B45547F953B7f9B21";   // Seller / buyback wallet
+    const CHAINLINK_ETH_USD = "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419"; // Mainnet ETH/USD feed
+    const ETHERSCAN_TX_BASE = "https://etherscan.io/tx/";
+    // Minimal ABI matching the contract functions used
+    const ABI = [
+      "function buyTokens() payable",
+      "function getLatestPrice() view returns (uint256)",
+      "function floorPrice() view returns (uint256)"
+    ];
+    // WalletConnect v1 / web3modal RPCs (mainnet)
+    const providerOptions = {
+      walletconnect: {
+        package: window.WalletConnectProvider,
+        options: {
+          rpc: { 1: "https://rpc.ankr.com/eth" }
         }
+      }
+    };
+    const web3Modal = new window.Web3Modal.default({ cacheProvider: false, providerOptions });
 
-        // Close modal
-        span.onclick = function() {
-            modal.style.display = "none";
+    // UI elements
+    const connectBtn = document.getElementById("connectBtn");
+    const disconnectBtn = document.getElementById("disconnectBtn");
+    const walletInput = document.getElementById("wallet");
+    const tokenQtyInput = document.getElementById("tokenQty");
+    const ethNeededInput = document.getElementById("ethNeeded");
+    const calcBtn = document.getElementById("calcBtn");
+    const buyBtn = document.getElementById("buyBtn");
+    const statusDiv = document.getElementById("status");
+    const txInfo = document.getElementById("txInfo");
+
+    let provider = null, web3provider = null, signer = null, contract = null;
+
+    function setStatus(msg, color="#9fb0c2"){ statusDiv.style.color = color; statusDiv.innerText = msg; }
+
+    // Connect wallet (opens selection modal)
+    connectBtn.onclick = async () => {
+      try {
+        setStatus("Opening wallet selector...");
+        web3provider = await web3Modal.connect();
+        provider = new ethers.providers.Web3Provider(web3provider);
+        signer = provider.getSigner();
+        const addr = await signer.getAddress();
+        walletInput.value = addr;
+        connectBtn.style.display = "none";
+        disconnectBtn.style.display = "inline-block";
+        setStatus("Connected: " + addr, "#7ee787");
+        contract = new ethers.Contract(TOKEN_CONTRACT, ABI, signer);
+        // verify chainId is mainnet (1)
+        const network = await provider.getNetwork();
+        if (network.chainId !== 1) {
+          setStatus("Switch your wallet to Ethereum Mainnet (chainId 1).", "#f1a1a1");
         }
+      } catch(err) {
+        console.error(err);
+        setStatus("Connection cancelled or failed", "#f1a1a1");
+      }
+    };
 
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
+    // Disconnect
+    disconnectBtn.onclick = async () => {
+      try { if (web3provider && web3provider.close) await web3provider.close(); } catch(e){}
+      web3Modal.clearCachedProvider();
+      provider = signer = contract = web3provider = null;
+      walletInput.value = "";
+      connectBtn.style.display = "inline-block";
+      disconnectBtn.style.display = "none";
+      ethNeededInput.value = ""; txInfo.innerHTML = "";
+      setStatus("Disconnected");
+    };
 
-        // Connect Wallet
-        async function connectWallet() {
-            if (window.ethereum) {
-                web3 = new Web3(window.ethereum);
-                try {
-                    const accounts = await ethereum.request({ method: "eth_requestAccounts" });
-                    userAccount = accounts[0];
-                    document.getElementById("walletAddress").value = userAccount;
-                    connectWalletBtn.innerText = "Disconnect Wallet";
-                    connectWalletBtn.onclick = disconnectWallet;
-                } catch (error) {
-                    console.error("Wallet connection failed:", error);
-                }
-            } else {
-                alert("MetaMask is not installed.");
-            }
-        }
+    // calculate ETH required using exact on-chain math:
+    // tokensToBuy = (msg.value * 1e18) / currentPrice
+    // => required msg.value = tokens * currentPrice / 1e18
+    async function calculateEthNeeded(){
+      if (!contract) { setStatus("Connect wallet to read on-chain price.", "#f1a1a1"); return; }
+      try {
+        setStatus("Reading on-chain price...");
+        const currentPriceBN = await contract.getLatestPrice(); // bigNumber
+        const tokens = Math.floor(Number(tokenQtyInput.value) || 0);
+        if (tokens < 1) { setStatus("Enter token amount (>=1).", "#f1a1a1"); return; }
+        const tokensBN = ethers.BigNumber.from(String(tokens));
+        const WEI = ethers.BigNumber.from("1000000000000000000"); // 1e18
+        const ethNeededWei = tokensBN.mul(currentPriceBN).div(WEI);
+        const ethNeeded = ethers.utils.formatEther(ethNeededWei);
+        ethNeededInput.value = ethNeeded;
+        setStatus("ETH needed calculated.");
+        return ethNeededWei;
+      } catch (err) {
+        console.error(err);
+        setStatus("Failed to read price. See console.", "#f1a1a1");
+      }
+    }
 
-        // Disconnect Wallet
-        async function disconnectWallet() {
-            userAccount = null;
-            document.getElementById("walletAddress").value = "";
-            connectWalletBtn.innerText = "Connect Your MetaMask Wallet";
-            connectWalletBtn.onclick = connectWallet;
-        }
+    calcBtn.onclick = calculateEthNeeded;
 
-        // Check if wallet is already connected
-        async function checkWalletConnection() {
-            if (window.ethereum) {
-                web3 = new Web3(window.ethereum);
-                const accounts = await ethereum.request({ method: "eth_accounts" });
-                if (accounts.length > 0) {
-                    userAccount = accounts[0];
-                    document.getElementById("walletAddress").value = userAccount;
-                    connectWalletBtn.innerText = "Disconnect Wallet";
-                    connectWalletBtn.onclick = disconnectWallet;
-                }
-            }
-        }
+    buyBtn.onclick = async () => {
+      if (!contract){ setStatus("Connect wallet first.", "#f1a1a1"); return; }
+      const tokensCount = Math.floor(Number(tokenQtyInput.value) || 0);
+      if (tokensCount < 1) return alert("Enter token count (>=1).");
+      setStatus("Preparing purchase...");
+      try {
+        const currentPriceBN = await contract.getLatestPrice();
+        const tokensBN = ethers.BigNumber.from(String(tokensCount));
+        const WEI = ethers.BigNumber.from("1000000000000000000");
+        const ethNeededWei = tokensBN.mul(currentPriceBN).div(WEI);
 
-        // Fetch Exchange Rate
-        async function fetchExchangeRate() {
-            try {
-                const response = await fetch('https://api.example.com/exchange-rate');
-                const data = await response.json();
-                exchangeRate = data.rate;
-                document.getElementById('exchangeRateDisplay').innerText = `Exchange Rate: 1 ETH = ${exchangeRate} Reach 9D-RC`;
-            } catch (error) {
-                console.error('Failed to fetch exchange rate:', error);
-            }
-        }
+        setStatus("Sending transaction — confirm in wallet...");
+        const tx = await contract.buyTokens({ value: ethNeededWei });
+        txInfo.innerHTML = `<div class="muted">Tx submitted: <pre>${tx.hash}</pre></div>`;
+        setStatus("Waiting for confirmation...");
+        await tx.wait();
+        setStatus("Purchase confirmed! 🎉", "#7ee787");
+        txInfo.innerHTML += `<div>View: <a href="${ETHERSCAN_TX_BASE + tx.hash}" target="_blank" rel="noreferrer">${tx.hash}</a></div>`;
+      } catch (err) {
+        console.error(err);
+        const msg = err && err.message ? err.message : String(err);
+        setStatus("Transaction failed: " + msg, "#f1a1a1");
+      }
+    };
 
-        // Fetch Gas Fee
-        async function fetchGasFee() {
-            try {
-                const response = await fetch('https://api.example.com/gas-fee');
-                const data = await response.json();
-                gasFee = data.fee;
-                document.getElementById('gasFeeDisplay').innerText = `Estimated Gas Fees: ${gasFee} ETH`;
-            } catch (error) {
-                console.error('Failed to fetch gas fee:', error);
-            }
-        }
+    // handle account / network changes by forcing reconnect
+    if (window.ethereum){
+      window.ethereum.on("accountsChanged", () => { disconnectBtn.click(); });
+      window.ethereum.on("chainChanged", () => { disconnectBtn.click(); });
+    }
 
-        // Initial fetch and interval updates
-        setInterval(fetchExchangeRate, 60000); // Update every 60 seconds
-        setInterval(fetchGasFee, 60000); // Update every 60 seconds
-        fetchExchangeRate(); // Initial fetch
-        fetchGasFee(); // Initial fetch
-
-        // Update Reach 9D-RC amount based on ETH input
-        async function updateReachAmount(ethAmount) {
-            const ethPriceUSD = await fetchETHPrice(); // Get current ETH price in USD
-            const reachPriceUSD = 27; // Fixed price per Reach 9D-RC
-
-            const reachAmount = (ethAmount * ethPriceUSD) / reachPriceUSD;
-            document.getElementById("reachTokenAmount").innerText = reachAmount.toFixed(2);
-        }
-
-        // Fetch ETH Price
-        async function fetchETHPrice() {
-            try {
-                const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd");
-                const data = await response.json();
-                return data.ethereum.usd;
-            } catch (error) {
-                console.error("Failed to fetch ETH price:", error);
-                return 0;
-            }
-        }
-
-        // Handle form submission for buying tokens
-        document.getElementById('sellTokensForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
-            const walletAddress = userAccount;
-            const ethAmount = document.getElementById('ethAmount').value;
-            const reachAmount = ethAmount * exchangeRate;
-
-            try {
-                const response = await fetch('https://new-reach-backend.vercel.app/api/sell-tokens', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ walletAddress, amount: reachAmount })
-                });
-
-                const data = await response.json();
-                document.getElementById('message').innerText = `Success! Transaction Hash: ${data.txHash}`;
-            } catch (error) {
-                document.getElementById('message').innerText = 'Failed to process the transaction. Please try again.';
-            }
-        });
-
-        // Run check on page load
-        checkWalletConnection();
-
-        // Assign button event
-        const connectWalletBtn = document.getElementById("connectWalletBtn");
-        connectWalletBtn.onclick = connectWallet;
-
-        // Define buyTokens function with enhanced error handling
-        async function buyTokens() {
-            if (!userAccount) {
-                alert("Please connect your wallet first.");
-                return;
-            }
-
-            let reachAmount = prompt("Enter the number of Reach Tokens you want to buy:");
-
-            if (!reachAmount || isNaN(reachAmount) || reachAmount <= 0) {
-                alert("Invalid amount.");
-                return;
-            }
-
-            try {
-                const response = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd");
-                const data = await response.json();
-                const ethPrice = data.ethereum.usd;  // Get ETH price in USD
-
-                const reachPriceUSD = 27;  // Fixed price for 1 Reach Token
-                const ethCost = (reachAmount * reachPriceUSD) / ethPrice;  // Convert to ETH
-
-                const confirmPurchase = confirm(`You are buying ${reachAmount} REACH for ${ethCost.toFixed(6)} ETH. Confirm?`);
-                if (!confirmPurchase) return;
-
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const signer = provider.getSigner();
-                const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-                const tx = await contract.buyTokens({
-                    value: ethers.utils.parseEther(ethCost.toString())  // Send the correct ETH amount
-                });
-
-                alert("Transaction sent! Waiting for confirmation...");
-                await tx.wait();
-                alert(`Purchase successful! You received ${reachAmount} REACH.`);
-            } catch (error) {
-                console.error("Transaction failed:", error);
-                alert(`Transaction failed. Reason: ${error.message}`);
-            }
-        }
-    </script>
+    setStatus("Ready. Connect a wallet to begin.");
+  })();
+  </script>
 </body>
 </html>
