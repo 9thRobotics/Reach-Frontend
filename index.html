@@ -62,7 +62,7 @@
     // ---------- CONFIG ----------
     const TOKEN_CONTRACT = "0x41A61CdCf40a074546423Bae987B81733F3FBAc5";
     const RECEIVER_WALLET = "0x0557afA4318989702376D50B45547F953B7f9B21";
-    const CHAIN_CAIP = "eip155:1"; // WalletConnect CAIP for Ethereum mainnet
+    const CHAIN_CAIP = "eip155:1"; // CAIP for Ethereum mainnet
     const CHAIN_ID = 1;
     const ETHERSCAN_TX = "https://etherscan.io/tx/";
 
@@ -73,7 +73,7 @@
       "function floorPrice() view returns (uint256)"
     ];
 
-    // Public WalletConnect v2 projectId (you can replace with yours)
+    // Public WalletConnect v2 projectId (works out-of-the-box). Replace if you have your own.
     const WC_PROJECT_ID = "c9a8238f1e4b213249f3dfd76bd84f89";
 
     // UI refs
@@ -98,7 +98,7 @@
       statusEl.textContent = msg;
     }
 
-    // --------- Init Web3Modal HTML (v2) with CAIP chain object ----------
+    // Init Web3Modal HTML (v2) with CAIP chain object
     try {
       const modalOptions = {
         projectId: WC_PROJECT_ID,
@@ -122,33 +122,34 @@
         }
       };
 
-      // Web3Modal HTML exposes Web3ModalHTML.Web3Modal
       web3Modal = new window.Web3ModalHTML.Web3Modal(modalOptions);
     } catch (e) {
       console.error("web3modal init error", e);
-      setStatus("Failed to initialize wallet modal. Check console.", "#f1a1a1");
+      setStatus("Failed to initialize wallet modal. See console.", "#f1a1a1");
     }
 
-    // ---------- Connect wallet (tries injected first; if it fails opens modal) ----------
+    // Connect wallet: try injected first, fallback to modal (WalletConnect QR)
     async function connectWallet() {
       setStatus("Connecting...");
       try {
-        // Prefer injected provider (MetaMask / injected wallet)
+        // Prefer injected provider (MetaMask / injected)
         if (window.ethereum && window.ethereum.request) {
-          // Try to switch to mainnet first (this won't throw on mobile providers)
           try {
+            // attempt chain switch (some wallets ignore this)
             await window.ethereum.request({ method: "wallet_switchEthereumChain", params:[{ chainId: "0x1" }] });
-          } catch (_) { /* ignore, wallet may not support switch */ }
-
-          // request accounts
-          await window.ethereum.request({ method: "eth_requestAccounts" });
-          web3Provider = window.ethereum;
+          } catch (_) {/* ignore */}
+          try {
+            await window.ethereum.request({ method: "eth_requestAccounts" });
+            web3Provider = window.ethereum;
+          } catch (e) {
+            // user declined injected request -> fall back
+            web3Provider = await web3Modal.connect();
+          }
         } else {
-          // No injected provider — open web3modal to choose (WalletConnect QR, etc.)
+          // no injected provider -> modal
           web3Provider = await web3Modal.connect();
         }
 
-        // Wrap with ethers provider
         provider = new ethers.providers.Web3Provider(web3Provider, "any");
         signer = provider.getSigner();
         const network = await provider.getNetwork();
@@ -161,7 +162,7 @@
         contract = new ethers.Contract(TOKEN_CONTRACT, ABI, signer);
         setStatus("Connected: " + addr, "#7ee787");
 
-        // handle provider disconnects or account changes
+        // listen for provider events and disconnect on changes
         if (web3Provider && web3Provider.on) {
           web3Provider.on("accountsChanged", () => { disconnectWallet(); });
           web3Provider.on("chainChanged", () => { disconnectWallet(); });
@@ -170,10 +171,12 @@
       } catch (err) {
         console.error("connectWallet err", err);
         setStatus("Connection failed or cancelled.", "#f1a1a1");
-        // If injected provider crashed (Trust extension bug), automatically open Web3Modal as fallback
-        if (err && err.message && err.message.toLowerCase().includes("could not establish connection")) {
+
+        // If injected provider crashed (Trust extension bug), try WalletConnect fallback
+        const msg = err && err.message ? err.message.toLowerCase() : "";
+        if (msg.includes("could not establish connection") || msg.includes("receiving end does not exist")) {
           try {
-            setStatus("Injected wallet failed — falling back to WalletConnect modal...", "#f1a1a1");
+            setStatus("Injected wallet failed — falling back to WalletConnect...", "#f1a1a1");
             web3Provider = await web3Modal.connect();
             provider = new ethers.providers.Web3Provider(web3Provider, "any");
             signer = provider.getSigner();
@@ -192,11 +195,7 @@
     connectBtn.addEventListener("click", connectWallet);
 
     async function disconnectWallet() {
-      try {
-        if (web3Provider && web3Provider.disconnect) {
-          try { await web3Provider.disconnect(); } catch(e){/*ignore*/ }
-        }
-      } catch(e){}
+      try { if (web3Provider && web3Provider.disconnect) await web3Provider.disconnect(); } catch(e){}
       try { web3Modal && web3Modal.clearCachedProvider && web3Modal.clearCachedProvider(); } catch(e){}
       web3Provider = provider = signer = contract = null;
       walletAddressInput.value = "";
@@ -205,9 +204,7 @@
       setStatus("Disconnected");
     }
 
-    // ---------- Calculate ETH needed ----------
-    // tokensToBuy = (msg.value * 1e18) / currentPrice
-    // => msg.value = tokens * currentPrice / 1e18
+    // Calculate ETH needed using contract's math
     async function calculateEthNeeded() {
       if (!contract) { setStatus("Connect wallet first to read price.", "#f1a1a1"); return; }
       try {
@@ -229,7 +226,7 @@
 
     calcBtn.addEventListener("click", calculateEthNeeded);
 
-    // ---------- Buy Tokens ----------
+    // Buy tokens: call buyTokens() payable
     buyBtn.addEventListener("click", async () => {
       if (!contract) { setStatus("Connect wallet first.", "#f1a1a1"); return; }
       const tokensCount = Math.floor(Number(tokenQtyInput.value) || 0);
@@ -256,9 +253,9 @@
         const msg = err && err.message ? err.message : String(err);
         setStatus("Transaction failed: " + msg, "#f1a1a1");
 
-        // If Trust Wallet extension bug appears, suggest WalletConnect QR
-        if (msg && msg.toLowerCase().includes("could not establish connection")) {
-          if (confirm("Your extension wallet failed to complete the request. Use WalletConnect (mobile) instead?")) {
+        // If injected extension/hijack crashed, prompt fallback to WalletConnect
+        if (msg && (msg.toLowerCase().includes("could not establish connection") || msg.toLowerCase().includes("receiving end does not exist"))) {
+          if (confirm("Injected wallet failed to complete request. Use WalletConnect (mobile) instead?")) {
             try {
               web3Provider = await web3Modal.connect();
               provider = new ethers.providers.Web3Provider(web3Provider, "any");
@@ -274,7 +271,7 @@
       }
     });
 
-    // final
+    // Ready
     setStatus("Ready. Connect a wallet to begin.");
   })();
   </script>
